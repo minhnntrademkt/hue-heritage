@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huế Heritage – AI Storyboard & Marketing Dashboard</title>
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-primary: #0D0914;
+            --bg-secondary: #161024;
+            --bg-tertiary: #201733;
+            --accent-gold: #D4AF37;
+            --accent-gold-hover: #F3E5AB;
+            --text-main: #E9E4F0;
+            --text-muted: #9D93A8;
+            --border-color: rgba(212, 175, 55, 0.2);
+            --card-glass: rgba(22, 16, 36, 0.75);
+            --shadow-gold: 0 8px 32px 0 rgba(212, 175, 55, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Cinzel', 'Outfit', serif;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        /* Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .brand-logo {
+            font-size: 26px;
+            color: var(--accent-gold);
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));
+        }
+
+        .brand h2 {
+            font-size: 22px;
+            letter-spacing: 1px;
+            color: #FFFFFF;
+        }
+
+        .brand h2 span {
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .form-input {
+            background-color: var(--bg-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        select.form-input {
+            appearance: none;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #A88225 100%);
+            color: #0D0914;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, var(--accent-gold-hover) 0%, var(--accent-gold) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-gold);
+            color: #FFFFFF;
+        }
+
+        /* Quick Samples */
+        .samples-section {
+            border-top: 1px solid rgba(212, 175, 55, 0.15);
+            padding-top: 20px;
+        }
+
+        .samples-section h4 {
+            font-size: 12px;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sample-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sample-btn {
+            background-color: var(--bg-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: var(--text-main);
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sample-btn:hover {
+            border-color: var(--accent-gold);
+            background-color: rgba(212, 175, 55, 0.08);
+            color: #FFFFFF;
+        }
+
+        .sample-btn i {
+            color: var(--accent-gold);
+            opacity: 0.8;
+        }
+
+        /* Main Content View */
+        .main-content {
+            padding: 32px 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .content-header-info h2 {
+            font-size: 26px;
+            margin-bottom: 4px;
+            color: var(--accent-gold);
+        }
+
+        .content-header-info p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .status-badge {
+            background-color: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge.loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Feed Layout */
+        .storyboard-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* Scene Card */
+        .scene-card {
+            background: var(--card-glass);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-gold);
+            transition: all 0.3s ease;
+        }
+
+        .scene-card:hover {
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 12px 40px 0 rgba(212, 175, 55, 0.18);
+        }
+
+        .scene-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .scene-badge-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .scene-number {
+            background: var(--accent-gold);
+            color: #0D0914;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .scene-duration {
+            color: var(--text-muted);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .scene-touchpoint {
+            color: var(--accent-gold);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .scene-body {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 24px;
+        }
+
+        .scene-details {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .detail-block h5 {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-block h5 i {
+            color: var(--accent-gold);
+        }
+
+        .detail-content {
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 14px;
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            line-height: 1.6;
+        }
+
+        .vo-content {
+            background-color: rgba(212, 175, 55, 0.06);
+            border: 1px dashed rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 14px;
+            color: #FFFFFF;
+            font-style: italic;
+        }
+
+        /* Voice Waveform Simulator */
+        .audio-waveform-sim {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 20px;
+            width: fit-content;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .audio-waveform-sim:hover {
+            background: rgba(212, 175, 55, 0.15);
+        }
+
+        .wave-bar {
+            width: 3px;
+            background-color: var(--accent-gold);
+            border-radius: 3px;
+            transition: height 0.2s ease;
+        }
+
+        .audio-waveform-sim.playing .wave-bar {
+            animation: pulse-wave 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-wave {
+            0% { transform: scaleY(0.4); }
+            100% { transform: scaleY(1.3); }
+        }
+
+        /* Mobile Mockup Preview */
+        .mobile-mockup {
+            background-color: #120D1C;
+            border-radius: 24px;
+            border: 8px solid #281D3D;
+            height: 480px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .mobile-mockup::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 18px;
+            background-color: #281D3D;
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        .mockup-overlay-grad {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(13,9,20,0.92) 0%, rgba(13,9,20,0.3) 50%, rgba(13,9,20,0.6) 100%);
+            z-index: 1;
+        }
+
+        .mockup-content {
+            position: relative;
+            z-index: 2;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 100%;
+        }
+
+        .text-overlay-preview {
+            background-color: rgba(13, 9, 20, 0.75);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            padding: 12px;
+            color: #FFFFFF;
+            font-family: 'Cinzel', 'Outfit', serif;
+            font-weight: 700;
+            font-size: 13px;
+            line-height: 1.4;
+            text-align: center;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            border-left: 4px solid var(--accent-gold);
+        }
+
+        .mockup-header-branding {
+            position: absolute;
+            top: 35px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .mockup-header-branding span {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.4);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--card-glass);
+            border: 1px dashed var(--border-color);
+            border-radius: 16px;
+            margin-top: 20px;
+        }
+
+        .empty-icon {
+            font-size: 54px;
+            color: var(--accent-gold);
+            opacity: 0.4;
+            margin-bottom: 14px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 15px;
+            max-width: 420px;
+            margin: 0 auto 20px auto;
+        }
+
+        /* Mobile & Tablet Responsive Queries */
+        @media (max-width: 992px) {
+            .app-container {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 20px;
+            }
+
+            .main-content {
+                width: 100%;
+                height: auto;
+                padding: 20px 15px;
+            }
+
+            .scene-body {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .mobile-mockup {
+                width: 100%;
+                max-width: 320px;
+                height: 480px;
+                margin: 0 auto;
+            }
+
+            .form-input {
+                font-size: 16px; /* Prevents auto-zoom on iOS Safari */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- SIDEBAR CONTROLS -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-crown brand-logo"></i>
+                <h2>Huế <span>Heritage</span></h2>
+            </div>
+
+            <!-- Form Options -->
+            <div class="form-group">
+                <label for="targetAudience">Target Đối Tượng Khách Hàng</label>
+                <textarea id="targetAudience" class="form-input" placeholder="Ví dụ: Khách hàng kiều bào & người con xứ Huế xa quê mua tài sản di sản vinh quy bái tổ..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="apartmentType">Loại Sản Phẩm Di Sản</label>
+                <div class="select-wrapper">
+                    <select id="apartmentType" class="form-input">
+                        <option value="Can ho Heritage 1PN">Căn hộ Heritage 1PN (~52m²)</option>
+                        <option value="Can ho Heritage 2PN View Song Huong" selected>Căn hộ Heritage 2PN - View Sông Hương (~78m²)</option>
+                        <option value="Can ho Heritage 3PN Executive Villa">Căn hộ Heritage 3PN Executive Villa (~135m²)</option>
+                        <option value="Biet thu di san Royal Villa">Biệt thự di sản Royal Villa (~250m² - 450m²)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Thông Điệp Chủ Đạo Chiến Dịch</label>
+                <textarea id="message" class="form-input" placeholder="Ví dụ: Sở hữu bất động sản di sản truyền đời kề bên Sông Hương với chiết khấu đợt 1 đến 15%..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="hook">Ý Tưởng Hook (0-3s đầu)</label>
+                <textarea id="hook" class="form-input" placeholder="Ví dụ: Đâu là gia sản truyền đời giá trị nhất mà người con xứ Huế luôn tự hào hướng về?..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Thời Lượng Video</label>
+                <div class="select-wrapper">
+                    <select id="duration" class="form-input">
+                        <option value="60 giây">60 Giây (Khuyên dùng)</option>
+                        <option value="45 giây">45 Giây</option>
+                        <option value="30 giây">30 Giây</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="aiModel">Mô Hình Gemini AI</label>
+                <div class="select-wrapper">
+                    <select id="aiModel" class="form-input">
+                        <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash (Mới nhất & Nhanh nhất)</option>
+                        <option value="gemini-3.5-flash">Gemini 3.5 Flash (Tiêu chuẩn)</option>
+                        <option value="gemini-3.1-pro">Gemini 3.1 Pro (Chuyên sâu)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Actions Grid -->
+            <div class="btn-group">
+                <button class="btn" id="btnGenerate" onclick="generateStoryboard()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo Kịch Bản
+                </button>
+                <button class="btn btn-secondary" onclick="resetApp()" title="Reset trang và biểu mẫu">
+                    <i class="fa-solid fa-trash-can"></i> Xóa
+                </button>
+            </div>
+
+            <!-- Quick Pre-loaded Templates -->
+            <div class="samples-section">
+                <h4>Kịch bản mẫu Huế Heritage (Xem ngay)</h4>
+                <div class="sample-buttons">
+                    <button class="sample-btn" onclick="loadSample('vinhquy')">
+                        <span><i class="fa-solid fa-torii-gate"></i> Vinh Quy Bái Tổ (Xứ Huế)</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="sample-btn" onclick="loadSample('disan')">
+                        <span><i class="fa-solid fa-gem"></i> Sưu Tầm Di Sản (Sông Hương)</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="sample-btn" onclick="loadSample('nghiduong')">
+                        <span><i class="fa-solid fa-crown"></i> Nghỉ Dưỡng Hoàng Gia 5*</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN STORYBOARD VIEW -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="content-header-info">
+                    <h2>Huế Heritage – Storyboard Dashboard</h2>
+                    <p id="campaignInfoText">Hãy điền thông tin chiến dịch bên trái và bấm Tạo Kịch Bản, hoặc bấm Kịch bản mẫu cài sẵn để xem ngay.</p>
+                </div>
+                <div id="statusIndicator" class="status-badge">
+                    <i class="fa-solid fa-check-circle"></i> Sẵn sàng
+                </div>
+            </header>
+
+            <!-- Feed Output Area -->
+            <section class="storyboard-feed" id="storyboardFeed">
+                <div class="empty-state">
+                    <i class="fa-solid fa-crown empty-icon"></i>
+                    <h3>Chào mừng đến với Huế Heritage Storyboard</h3>
+                    <p>Hệ thống AI Storyboard chuyên biệt cho bất động sản di sản Cố Đô Huế, thiết kế chuẩn Host người thật và hiển thị mô phỏng điện thoại.</p>
+                    <button class="btn btn-secondary" onclick="loadSample('vinhquy')">Xem mẫu demo ngay</button>
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Obfuscated Dedicated Huế Heritage API Key (Base64)
+        const OBFUSCATED_KEY = "QVEuQWI4Uk42SUN1Q3daUjV4LUdEY1FDdkpacUFkcFlLSTkyYjh6d0xVNm1LYlY1TDh5UGc=";
+
+        // Project Database for Huế Heritage
+        const DATA_HUE_HERITAGE = 
+            `DU AN: HUE HERITAGE (TP. Hue, Thua Thien Hue)
+Chu dau tu & Don vi phat trien: Tap doan Bat dong san Di san Viet Nam.
+Vi tri: Trung tam Co do Hue, ke ben dong song Huong tho mong, ket noi nhanh chong den Dai Noi (5 phut), Cau Trang Tien, Chua Thien Mu va quan the di san van hoa Hue.
+Quy mo: To hop Biet thu di san & Can ho luxury mang kien truc Royal Heritage tan co dien sang trong giao thoa giua net dep vuong gia Trieu Nguyen va phong cach thuong luu hien dai.
+So luong san pham: Gio hang doc ban gioi han.
+Co cau dien tich:
+  - Can ho Heritage 1PN: Can ~52m2.
+  - Can ho Heritage 2PN (View song Huong): Can ~78m2 den 85m2.
+  - Can ho Heritage 3PN Executive Villa: Can ~135m2.
+  - Biet thu di san Royal Villa: Can ~250m2 den 450m2.
+Tieu chuan ban giao: Full noi that mang dam tinh hoa van hoa Hue, op da tu nhien, kinh Low-E 27.5mm cach am can UV. Thiet bi ve sinh & bep cao cap nhap khau chau Au.
+Gia ban: Tu 55 trieu dong/m2.
+
+CHINH SACH BAN HANG DU KIEN:
+  - Nhan dat cho uu tien (Booking): 50 trieu dong/suat (co hoan phi).
+  - Chiet khau thanh toan nhanh: Dat muc tu 12% den 15%.
+  - Ho tro vay von: Ngan hang cho vay 70%, 0% lai suat tu 18 den 24 thang.
+  - Uu dai dac quyen: Mien phi quan ly van hanh 3 nam va the thanh vien Royal Heritage Club.
+
+BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy bai to, noi tro ve yen binh va kieu hanh cua nguoi con xu Hue.`;
+
+        // Preloaded Demos for Huế Heritage
+        const STATIC_DEMOS = {
+            vinhquy: [
+                {
+                    stt: 1,
+                    duration: "3 giây",
+                    message: "Chạm vào cảm xúc cội nguồn và vinh quy bái tổ.",
+                    visual: "Host đứng bên dòng sông Hương thơ mộng, phía xa là cầu Tràng Tiền hoài niệm. Host mỉm cười nhẹ nhàng nhìn vào ống kính.",
+                    textOverlay: "HUẾ HERITAGE\nNƠI TRỞ VỀ CỦA NGƯỜI CON XỨ HUẾ\nDI SẢN TRUYỀN ĐỜI",
+                    vo: "Dù đi xa muôn phương, đâu là nơi chốn bình yên nhất để người con xứ Huế hướng về và tạo dựng gia sản truyền đời cho thế hệ mai sau?"
+                },
+                {
+                    stt: 2,
+                    duration: "12 giây",
+                    message: "Khắc họa vị trí di sản kề bên sông Hương.",
+                    visual: "Cảnh flycam từ trên cao lia dọc dòng sông Hương thơ mộng ôm trọn tòa tháp Huế Heritage. Host di chuyển lịch lãm trong khuôn viên sảnh Royal Heritage.",
+                    textOverlay: "KỀ BÊN SÔNG HƯƠNG\n5 phút đến Đại Nội\nTâm điểm di sản Cố Đô\nKiến trúc Royal Heritage",
+                    vo: "Tọa lạc ngay trung tâm Cố Đô Huế kề sát dòng sông Hương di sản. Từ đây chỉ vài phút để kết nối đến Đại Nội, cầu Tràng Tiền và các danh thắng linh thiêng."
+                },
+                {
+                    stt: 3,
+                    duration: "15 giây",
+                    message: "Tôn vinh chất sống hoàng gia và không gian riêng tư.",
+                    visual: "Host bước vào căn hộ mẫu 2PN view sông Hương, lướt nhẹ tay trên chất liệu gỗ tự nhiên và mặt kính Low-E tràn viền ngắm hoàng hôn sông Hương.",
+                    textOverlay: "TÌNH HOÀN MỸ CỐ ĐÔ\nKính Low-E cản UV cách âm\nView trực diện Sông Hương\nNội thất Châu Âu nhập khẩu",
+                    vo: "Mỗi không gian tại Huế Heritage là một kiệt tác kiến trúc giao thoa giữa nét vương giả triều Nguyễn và phong cách sống hiện đại. Mang đến sự tĩnh tại và riêng tư tuyệt đối."
+                },
+                {
+                    stt: 4,
+                    duration: "15 giây",
+                    message: "Trình bày chính sách đòn bẩy và ưu đãi đặc quyền.",
+                    visual: "Host đứng tại sảnh đón sang trọng, trình bày biểu đồ ưu đãi chiết khấu 15% và chính sách hỗ trợ lãi suất 0%.",
+                    textOverlay: "ĐẶC QUYỀN ĐỢT 1\nChiết khấu đến 15%\nVốn ban đầu chỉ 30%\nLãi suất 0% 18-24 tháng",
+                    vo: "Sở hữu ngay đợt 1 với mức chiết khấu hấp dẫn đến 15%, ngân hàng hỗ trợ cho vay 70% với 0% lãi suất lên tới 24 tháng. Cơ hội tích lũy tài sản di sản độc bản."
+                },
+                {
+                    stt: 5,
+                    duration: "5 giây",
+                    message: "Kêu gọi hành động nhận thông tin giỏ hàng ưu tiên.",
+                    visual: "Host mỉm cười nhẹ nhàng vẫy tay chào, màn hình xuất hiện nút đăng ký nhận thông tin giỏ hàng đợt 1.",
+                    textOverlay: "ĐĂNG KÝ NGAY\nNhận bảng giá đợt 1\nƯu tiên chọn căn view Sông Hương",
+                    vo: "Hãy liên hệ ngay hôm nay để nhận thông tin chi tiết và sở hữu căn hộ di sản view sông Hương đẹp nhất!"
+                }
+            ],
+            disan: [
+                {
+                    stt: 1,
+                    duration: "3 giây",
+                    message: "Khơi gợi khát khao sưu tầm bất động sản di sản độc bản.",
+                    visual: "Host nâng ly trà trong không gian trà đạo hoàng gia, hướng mắt ngắm dòng sông Hương và quay sang chia sẻ đầy cảm hứng với người xem.",
+                    textOverlay: "BẤT ĐỘNG SẢN DI SẢN\nSỞ HỮU LÂU DÀI\nSÔNG HƯƠNG CỐ ĐÔ",
+                    vo: "Tiền tài có thể gia tăng, nhưng một bất động sản di sản truyền đời kề bên sông Hương Cố Đô thì luôn là tuyệt bản khan hiếm."
+                },
+                {
+                    stt: 2,
+                    duration: "12 giây",
+                    message: "Chứng minh giá trị gia tăng bền vững của đất di sản.",
+                    visual: "Góc quay drone panorama toàn cảnh thành phố Huế thuộc Trung ương, ghi nhận quần thể kiến trúc Huế Heritage nguy nga ven sông.",
+                    textOverlay: "ĐÔ THỊ DI SẢN\nGiá trị gia tăng bền vững\nBảo chứng tài sản gia tộc\nVị trí vàng hiếm có",
+                    vo: "Huế Heritage khẳng định giá trị bền vững cùng thời gian. Nơi tài sản của bạn không chỉ sinh lời mà còn là biểu tượng kiêu hãnh của gia tộc."
+                },
+                {
+                    stt: 3,
+                    duration: "15 giây",
+                    message: "Trực quan bàn giao full nội thất phong cách Royal Heritage.",
+                    visual: "Host chạm nhẹ vào các chi tiết dát vàng và đá tự nhiên tinh xảo tại phòng khách căn hộ 3PN Executive Villa.",
+                    textOverlay: "KIẾN TRÚC ROYAL\nFull nội thất vương giả\nĐá tự nhiên & Kính Low-E\nThương hiệu Châu Âu",
+                    vo: "Từng đường nét kiến trúc Royal Heritage được chế tác tỉ mỉ với bàn giao full nội thất vương giả, sẵn sàng chào đón những chủ nhân tinh hoa."
+                },
+                {
+                    stt: 4,
+                    duration: "5 giây",
+                    message: "Kêu gọi đăng ký tư vấn chọn căn ngoại giao.",
+                    visual: "Host mỉm cười cầm cuốn brochure vàng kim của Huế Heritage chỉ tay xuống nút gửi thông tin.",
+                    textOverlay: "LIÊN HỆ ĐỢT 1\nNhận bảng giá trực tiếp CĐT\nThẻ Royal Heritage Club",
+                    vo: "Đăng ký ngay hôm nay để sở hữu suất ngoại giao đợt 1 trực tiếp từ chủ đầu tư!"
+                }
+            ],
+            nghiduong: [
+                {
+                    stt: 1,
+                    duration: "3 giây",
+                    message: "Chạm vào nhu cầu nghỉ dưỡng tinh thần của chủ tịch.",
+                    visual: "Host thư thái dạo bước trong khuôn viên nhà vườn Huế tân cổ điển thanh bình, tiếng chuông chùa Thiên Mụ ngân vang xa xa.",
+                    textOverlay: "NGHỈ DƯỠNG HOÀNG GIA\nCHỐN BÌNH YÊN TĨNH TẠI\nRIÊNG TƯ 5 SAO",
+                    vo: "Sau những ồn ào của phố thị, đâu là chốn nghỉ dưỡng riêng tư tuyệt đối để bạn tái tạo năng lượng và tận hưởng trọn vẹn sự tĩnh tại?"
+                },
+                {
+                    stt: 2,
+                    duration: "12 giây",
+                    message: "Khắc họa đặc quyền thành viên Royal Heritage Club.",
+                    visual: "Host trải nghiệm tiện ích hồ bơi vô cực ngắm sông Hương và thưởng thức dịch vụ concierge 5 sao.",
+                    textOverlay: "ĐẶC QUYỀN 5 SAO\nRoyal Heritage Club\nMiễn phí 3 năm vận hành\nView trọn hoàng hôn Sông Hương",
+                    vo: "Thưởng thức đặc quyền chuẩn 5 sao với dịch vụ quản lý vận hành chuyên nghiệp và thẻ hội viên Royal Heritage Club đẳng cấp."
+                },
+                {
+                    stt: 3,
+                    duration: "5 giây",
+                    message: "Kêu gọi đặt chỗ ưu tiên.",
+                    visual: "Host mỉm cười mời người xem đăng ký tham quan thực tế dự án Huế Heritage.",
+                    textOverlay: "ĐẶT CHỖ ƯU TIÊN 50TR\nChọn căn view đẹp nhất\nHoàn tiền 100% nếu đổi ý",
+                    vo: "Đặt chỗ ưu tiên ngay hôm nay chỉ với 50 triệu để sở hữu không gian nghỉ dưỡng di sản tuyệt vời này!"
+                }
+            ]
+        };
+
+        // Load Sample helper
+        function loadSample(type) {
+            const scenes = STATIC_DEMOS[type];
+            if (!scenes) return;
+
+            let campaignName = "";
+            if (type === 'vinhquy') campaignName = "Vinh Quy Bái Tổ (Xứ Huế)";
+            if (type === 'disan') campaignName = "Sưu Tầm Di Sản (Sông Hương)";
+            if (type === 'nghiduong') campaignName = "Nghỉ Dưỡng Hoàng Gia 5*";
+
+            document.getElementById('campaignInfoText').innerHTML = `Đang xem kịch bản mẫu: <strong>${campaignName}</strong> (Dự án Huế Heritage)`;
+            renderStoryboard(scenes);
+
+            if (type === 'vinhquy') {
+                document.getElementById('targetAudience').value = "Khách hàng kiều bào & người con xứ Huế xa quê muốn mua tài sản di sản vinh quy bái tổ / báo hiếu cha mẹ.";
+                document.getElementById('message').value = "Sở hữu bất động sản di sản truyền đời kề bên Sông Hương với chiết khấu đợt 1 đến 15%.";
+                document.getElementById('hook').value = "Đâu là gia sản truyền đời giá trị nhất mà người con xứ Huế luôn tự hào hướng về?";
+            } else if (type === 'disan') {
+                document.getElementById('targetAudience').value = "Nhà đầu tư sưu tầm bất động sản di sản độc bản kề bên sông Hương.";
+                document.getElementById('message').value = "Tài sản di sản truyền đời gia tăng giá trị bền vững cùng thời gian.";
+                document.getElementById('hook').value = "Tuyệt bản bất động sản di sản kề bên sông Hương Cố Đô?";
+            } else {
+                document.getElementById('targetAudience').value = "Giới thượng lưu mua căn hộ nghỉ dưỡng văn hóa 5 sao tĩnh tại tại Huế.";
+                document.getElementById('message').value = "Chốn trú ẩn nghỉ dưỡng 5 sao tĩnh tại với đặc quyền Royal Heritage Club.";
+                document.getElementById('hook').value = "Chốn nghỉ dưỡng tĩnh tại hoàng gia riêng tư giữa lòng Cố Đô?";
+            }
+        }
+
+        // Reset App Form
+        function resetApp() {
+            document.getElementById('targetAudience').value = '';
+            document.getElementById('message').value = '';
+            document.getElementById('hook').value = '';
+            document.getElementById('campaignInfoText').innerText = 'Hãy điền thông tin chiến dịch bên trái và bấm Tạo Kịch Bản, hoặc bấm Kịch bản mẫu cài sẵn để xem ngay.';
+            document.getElementById('statusIndicator').className = 'status-badge';
+            document.getElementById('statusIndicator').innerHTML = '<i class="fa-solid fa-check-circle"></i> Sẵn sàng';
+
+            document.getElementById('storyboardFeed').innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-solid fa-crown empty-icon"></i>
+                    <h3>Chào mừng đến với Huế Heritage Storyboard</h3>
+                    <p>Hệ thống AI Storyboard chuyên biệt cho bất động sản di sản Cố Đô Huế, thiết kế chuẩn Host người thật và hiển thị mô phỏng điện thoại.</p>
+                    <button class="btn btn-secondary" onclick="loadSample('vinhquy')">Xem mẫu demo ngay</button>
+                </div>
+            `;
+        }
+
+        // Native TTS Fallback
+        function fallbackToNativeTTS(text, element) {
+            const cleanedText = text.replace(/<[^>]*>/g, '').trim();
+            const utterance = new SpeechSynthesisUtterance(cleanedText);
+            utterance.lang = "vi-VN"; 
+
+            const currentVoices = window.speechSynthesis.getVoices();
+            const viVoice = currentVoices.find(voice => 
+                voice.lang.toLowerCase().replace('_', '-').includes('vi-vn') || 
+                voice.lang.toLowerCase().startsWith('vi')
+            );
+            
+            if (viVoice) utterance.voice = viVoice;
+            utterance.rate = 0.92;
+
+            utterance.onend = () => {
+                element.classList.remove('playing');
+                element.querySelector('.play-icon').className = 'fa-solid fa-play play-icon';
+            };
+
+            utterance.onerror = () => {
+                element.classList.remove('playing');
+                element.querySelector('.play-icon').className = 'fa-solid fa-play play-icon';
+            };
+
+            element.classList.add('playing');
+            element.querySelector('.play-icon').className = 'fa-solid fa-stop play-icon';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Play Vietnamese Voice Synthesis
+        function playVoice(element, text) {
+            if (element.classList.contains('playing')) {
+                if (element.currentAudio) {
+                    element.currentAudio.pause();
+                    element.currentAudio = null;
+                }
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                element.classList.remove('playing');
+                element.querySelector('.play-icon').className = 'fa-solid fa-play play-icon';
+                return;
+            }
+
+            document.querySelectorAll('.audio-waveform-sim.playing').forEach(el => {
+                el.classList.remove('playing');
+                el.querySelector('.play-icon').className = 'fa-solid fa-play play-icon';
+                if (el.currentAudio) {
+                    el.currentAudio.pause();
+                    el.currentAudio = null;
+                }
+            });
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+            const cleanedText = text.replace(/<[^>]*>/g, '').trim();
+            const sentences = cleanedText.match(/[^.!?]+[.!?]*/g) || [cleanedText];
+            let chunks = [];
+            
+            sentences.forEach(s => {
+                let str = s.trim();
+                if (!str) return;
+                if (str.length > 150) {
+                    let subparts = str.split(',');
+                    subparts.forEach(sp => {
+                        let trimmed = sp.trim();
+                        if (trimmed) chunks.push(trimmed);
+                    });
+                } else {
+                    chunks.push(str);
+                }
+            });
+
+            if (chunks.length === 0) {
+                fallbackToNativeTTS(cleanedText, element);
+                return;
+            }
+
+            let currentChunkIndex = 0;
+            function playNextChunk() {
+                if (currentChunkIndex >= chunks.length || !element.classList.contains('playing')) {
+                    element.classList.remove('playing');
+                    element.querySelector('.play-icon').className = 'fa-solid fa-play play-icon';
+                    element.currentAudio = null;
+                    return;
+                }
+
+                const encodeText = encodeURIComponent(chunks[currentChunkIndex]);
+                const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeText}&tl=vi&client=tw-ob`;
+
+                const audio = new Audio(ttsUrl);
+                element.currentAudio = audio;
+
+                audio.play().then(() => {
+                    audio.onended = () => {
+                        currentChunkIndex++;
+                        playNextChunk();
+                    };
+                }).catch(err => {
+                    console.warn("Audio stream blocked, fallback to Native TTS");
+                    fallbackToNativeTTS(cleanedText, element);
+                });
+            }
+
+            element.classList.add('playing');
+            element.querySelector('.play-icon').className = 'fa-solid fa-stop play-icon';
+            playNextChunk();
+        }
+
+        // Render Storyboard Cards
+        function renderStoryboard(scenes) {
+            const feed = document.getElementById('storyboardFeed');
+            feed.innerHTML = '';
+
+            scenes.forEach(scene => {
+                const card = document.createElement('div');
+                card.className = 'scene-card';
+                
+                let waveHtml = '';
+                for (let i = 0; i < 28; i++) {
+                    let h = Math.floor(Math.random() * 18) + 6;
+                    let delay = (Math.random() * 0.5).toFixed(2);
+                    waveHtml += `<div class="wave-bar" style="height: ${h}px; animation-delay: ${delay}s;"></div>`;
+                }
+
+                let bgStyle = 'linear-gradient(135deg, #181028 0%, #0d0914 100%)';
+
+                card.innerHTML = `
+                    <div class="scene-header">
+                        <div class="scene-badge-group">
+                            <span class="scene-number">CẢNH ${scene.stt}</span>
+                            <span class="scene-duration"><i class="fa-regular fa-clock"></i> ${scene.duration || '0-3s'}</span>
+                        </div>
+                        <span class="scene-touchpoint"><i class="fa-solid fa-crown"></i> ${scene.message}</span>
+                    </div>
+                    <div class="scene-body">
+                        <div class="scene-details">
+                            <div class="detail-block">
+                                <h5><i class="fa-solid fa-camera"></i> Hình ảnh / Ghi chú quay (Visual)</h5>
+                                <div class="detail-content" contenteditable="true">${scene.visual}</div>
+                            </div>
+                            <div class="detail-block">
+                                <h5><i class="fa-solid fa-microphone"></i> Nội dung Voice-over (VO) thuyết minh của Host</h5>
+                                <div class="vo-content">
+                                    <div contenteditable="true" id="voText_${scene.stt}">${scene.vo}</div>
+                                    <div class="audio-waveform-sim" onclick="playVoice(this, document.getElementById('voText_${scene.stt}').innerText)">
+                                        <i class="fa-solid fa-play play-icon" style="color: var(--accent-gold); font-size: 11px; margin-right: 8px;"></i>
+                                        ${waveHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mobile-mockup" style="background: ${bgStyle};">
+                            <div class="mockup-overlay-grad"></div>
+                            <div class="mockup-header-branding">
+                                <span>Huế Heritage</span>
+                            </div>
+                            <div class="mockup-content">
+                                <div class="text-overlay-preview">
+                                    ${scene.textOverlay.replace(/\n/g, '<br>')}
+                                </div>
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                                    <div style="width:24px; height:24px; border-radius:50%; background:var(--accent-gold); color:#0D0914; font-weight:bold; font-size:11px; display:flex; align-items:center; justify-content:center;">H</div>
+                                    <div style="font-size:12px; font-weight:600; color:#FFF;">hue.heritage</div>
+                                </div>
+                                <div style="font-size:11px; color:#AAA;">Đăng ký nhận suất ngoại giao đợt 1... #hueheritage #songhuong</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        // Call Gemini API
+        async function generateStoryboard() {
+            const apiKey = atob(OBFUSCATED_KEY);
+            const target = document.getElementById('targetAudience').value.trim();
+            const apartment = document.getElementById('apartmentType').value;
+            const message = document.getElementById('message').value.trim();
+            const hook = document.getElementById('hook').value.trim();
+            const duration = document.getElementById('duration').value;
+            const selectedModel = document.getElementById('aiModel') ? document.getElementById('aiModel').value : 'gemini-3.6-flash';
+
+            if (!target || !message || !hook) {
+                alert("Vui lòng điền đầy đủ thông tin chiến dịch (Target, Thông điệp, Ý tưởng Hook)!");
+                return;
+            }
+
+            const statusIndicator = document.getElementById('statusIndicator');
+            const feed = document.getElementById('storyboardFeed');
+
+            statusIndicator.className = "status-badge loading";
+            statusIndicator.innerHTML = `<i class="fa-solid fa-spinner"></i> Đang kết nối mô hình ${selectedModel}...`;
+            
+            feed.innerHTML = `
+                <div class="skeleton-card" style="background:var(--bg-secondary); padding:20px; border-radius:12px;">
+                    <div style="height:20px; background:rgba(255,255,255,0.05); margin-bottom:10px;"></div>
+                    <div style="height:60px; background:rgba(255,255,255,0.05);"></div>
+                </div>
+            `;
+
+            try {
+                const sysAssistant1 = 
+                    "Ban la Senior Copywriter va chuyen gia tam ly hoc hanh vi khach hang cao cap (HNWIs) tai Viet Nam.\n\n" +
+                    "NHIEM VU CHINH:\n" +
+                    "Dựa vào Target doi tuong, hãy viết PROMPT chiến lược cho dự án bất động sản di sản Huế Heritage kề bên Sông Hương.\n" +
+                    "- Phải tạo ra các Hook (0-3s) đánh trúng tử huyệt tâm lý (vinh quy bái tổ, di sản truyền đời, vinh hoa gia tộc...).\n" +
+                    "- TẬP TRUNG THIẾT KẾ QUAY VỚI HOST (NGƯỜI THẬT) DẪN DẮT xuyên suốt video.\n" +
+                    "Chỉ trả về đoạn prompt chiến lược bằng tiếng Việt.";
+
+                const csbhCanho = "Chính sách Huế Heritage: Booking 50 triệu (hoàn phí), CK đợt 1 đến 15% thanh toán nhanh, 0% lãi suất vay 70% từ 18-24 tháng, tặng thẻ Royal Heritage Club.";
+                const userMsg1 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nCHIEN DICH CAN VIET KICH BAN:\nLoai san pham: ${apartment}\nCSBH: ${csbhCanho}\nTarget doi tuong: ${target}\nThong diep: ${message}\nHook: ${hook}\nThoi luong: ${duration}`;
+
+                const promptChuan = await callGeminiAPI(sysAssistant1, userMsg1, apiKey, selectedModel);
+
+                statusIndicator.innerHTML = `<i class="fa-solid fa-spinner"></i> Đang tạo kịch bản phân cảnh...`;
+
+                const sysCreator = 
+                    "Ban la Creative Director va chuyen gia viet ad copy bat dong san sieu sang Viet Nam.\n\n" +
+                    "QUY TAC TAO HOOK & PHAN CANH (UGC HOST OPTIMIZED):\n" +
+                    "- Kịch bản xoay quanh HOST thực tế xuất hiện xuyên suốt cả video.\n" +
+                    "- Canh 1 (0-3s) dùng Hook tâm lý cực sâu chạm tới cội nguồn Cố Đô và Sông Hương.\n" +
+                    "Xuat DUNG MOT JSON ARRAY [] voi 6-8 phan canh. Moi phan canh co dung 6 truong (stt, duration, message, visual, textOverlay, vo).\n" +
+                    "YEU CAU TUYET DOI: Chi tra ve JSON thuan bat dau [ va ket thuc ]. Khong dung markdown, khong chu thich ngoai JSON.";
+
+                const userMsg2 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nPROMPT CHIEN LUOC TU ASSIST ASSISTANT 1:\n${promptChuan}`;
+
+                const jsonRaw = await callGeminiAPI(sysCreator, userMsg2, apiKey, selectedModel);
+                
+                const scenes = repairJson(jsonRaw);
+                renderStoryboard(scenes);
+
+                document.getElementById('campaignInfoText').innerHTML = `Chiến dịch Huế Heritage (${apartment}) | Model: <strong>${selectedModel}</strong>`;
+                statusIndicator.className = "status-badge";
+                statusIndicator.innerHTML = `<i class="fa-solid fa-check-circle"></i> Đã hoàn thành (${scenes.length} cảnh - ${selectedModel})`;
+
+            } catch (err) {
+                console.error(err);
+                statusIndicator.className = "status-badge loading";
+                statusIndicator.style.borderColor = "red";
+                statusIndicator.style.color = "red";
+                statusIndicator.innerHTML = `<i class="fa-solid fa-exclamation-triangle"></i> Gặp lỗi`;
+                
+                alert("Đã xảy ra lỗi trong quá trình xử lý:\n\n" + err.message);
+            }
+        }
+
+        async function callGeminiAPI(systemPrompt, userMessage, apiKey, model = 'gemini-3.6-flash') {
+            if (window.location.protocol.startsWith('http')) {
+                try {
+                    const res = await fetch('/api/generate', {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            systemInstruction: systemPrompt,
+                            userMessage: userMessage,
+                            model: model
+                        })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const parts = data.candidates[0].content.parts;
+                        for (let p = 0; p < parts.length; p++) {
+                            if (parts[p].text && !parts[p].thought) return parts[p].text;
+                        }
+                        for (let q = parts.length - 1; q >= 0; q--) {
+                            if (parts[q].text) return parts[q].text;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Serverless fetch error:", e);
+                }
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+            const payload = {
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents: [{ role: "user", parts: [{ text: userMessage }] }],
+                generationConfig: { temperature: 0.85, maxOutputTokens: 16384 }
+            };
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": apiKey
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            }
+
+            const data = await response.json();
+            const parts = data.candidates[0].content.parts;
+            for (let p = 0; p < parts.length; p++) {
+                if (parts[p].text && !parts[p].thought) return parts[p].text;
+            }
+            for (let q = parts.length - 1; q >= 0; q--) {
+                if (parts[q].text) return parts[q].text;
+            }
+            throw new Error("Không tìm thấy nội dung văn bản.");
+        }
+
+        function repairJson(jsonRaw) {
+            let clean = jsonRaw.replace(/```json/gi, '').replace(/```/g, '').trim();
+            const firstBracket = clean.indexOf('[');
+            const lastBracket = clean.lastIndexOf(']');
+            if (firstBracket !== -1 && lastBracket !== -1) {
+                clean = clean.substring(firstBracket, lastBracket + 1);
+            }
+            return JSON.parse(clean);
+        }
+
+        // Auto load initial demo
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSample('vinhquy');
+        });
+    </script>
+</body>
+</html>
