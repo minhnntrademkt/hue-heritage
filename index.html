@@ -705,8 +705,13 @@
                     <h2>Huế Heritage – Storyboard Dashboard</h2>
                     <p id="campaignInfoText">Hãy điền thông tin chiến dịch bên trái và bấm Tạo Kịch Bản, hoặc bấm Kịch bản mẫu cài sẵn để xem ngay.</p>
                 </div>
-                <div id="statusIndicator" class="status-badge">
-                    <i class="fa-solid fa-check-circle"></i> Sẵn sàng
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <button class="btn btn-secondary" onclick="exportToExcel()" style="padding: 8px 16px; font-size:13px; border-color:var(--accent-gold); color:var(--accent-gold);" title="Tải kịch bản về dạng file Excel .xlsx">
+                        <i class="fa-solid fa-file-excel"></i> Xuất File Excel
+                    </button>
+                    <div id="statusIndicator" class="status-badge">
+                        <i class="fa-solid fa-check-circle"></i> Sẵn sàng
+                    </div>
                 </div>
             </header>
 
@@ -1011,8 +1016,45 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             playNextChunk();
         }
 
+        // Export Storyboard to Excel (.xlsx)
+        function exportToExcel() {
+            if (!window.currentScenes || window.currentScenes.length === 0) {
+                alert("Chưa có kịch bản nào được tạo. Vui lòng bấm 'Tạo Kịch Bản' hoặc chọn kịch bản mẫu trước!");
+                return;
+            }
+
+            const dataForExcel = window.currentScenes.map(scene => ({
+                "STT Phân Cảnh": `Cảnh ${scene.stt}`,
+                "Thời Lượng": scene.duration || '0-3s',
+                "Thông Điệp / Điểm Chạm": scene.message || '',
+                "Hình Ảnh & Ghi Chú Quay (Visual Host)": scene.visual || '',
+                "Text Overlay (Chữ Màn Hình)": scene.textOverlay || '',
+                "Nội Dung Thoại VO (Host)": scene.vo || ''
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+            
+            worksheet['!cols'] = [
+                { wch: 14 },
+                { wch: 14 },
+                { wch: 32 },
+                { wch: 50 },
+                { wch: 38 },
+                { wch: 50 }
+            ];
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Kịch Bản Storyboard");
+
+            const today = new Date().toISOString().split('T')[0];
+            const filename = `Kich_Ban_Hue_Heritage_${today}.xlsx`;
+
+            XLSX.writeFile(workbook, filename);
+        }
+
         // Render Storyboard Cards
         function renderStoryboard(scenes) {
+            window.currentScenes = scenes;
             const feed = document.getElementById('storyboardFeed');
             feed.innerHTML = '';
 
