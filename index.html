@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS for Excel (.xlsx, .xls, .csv) parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root {
@@ -633,17 +635,19 @@
             <div style="border-top: 1px dashed rgba(212, 175, 55, 0.2); padding-top: 14px; margin-top: 6px;">
                 <div class="form-group">
                     <label style="color: var(--accent-gold); display: flex; align-items: center; justify-content: space-between;">
-                        <span><i class="fa-solid fa-photo-film"></i> Mẫu Tham Khảo (Video / File Kịch Bản)</span>
-                        <span style="text-transform:none; opacity:0.8; font-weight:normal; cursor:pointer; font-size:11px;" onclick="document.getElementById('refFileInput').click()"><i class="fa-solid fa-upload"></i> Tải file</span>
+                        <span><i class="fa-solid fa-photo-film"></i> Mẫu Tham Khảo (Excel / Video / File)</span>
+                        <span style="text-transform:none; opacity:0.8; font-weight:normal; cursor:pointer; font-size:11px;" onclick="document.getElementById('refFileInput').click()"><i class="fa-solid fa-upload"></i> Tải file từ máy</span>
                     </label>
                     
-                    <input type="file" id="refFileInput" accept=".txt,.md,.doc,.docx,.json" style="display:none;" onchange="handleRefFileUpload(event)">
+                    <input type="file" id="refFileInput" accept=".txt,.md,.doc,.docx,.json,.csv,.xls,.xlsx,.mp4,.mov,.webm,.avi" style="display:none;" onchange="handleRefFileUpload(event)">
                     
                     <input type="url" id="refVideoUrl" class="form-input" placeholder="Dán link Video mẫu (TikTok/Reels/YouTube)..." style="margin-bottom: 6px;">
                     
-                    <textarea id="refScriptText" class="form-input" placeholder="Dán văn bản kịch bản mẫu đối thủ / style bạn thích tại đây, hoặc bấm Tải file (.txt, .md)..."></textarea>
+                    <textarea id="refScriptText" class="form-input" placeholder="Dán kịch bản mẫu đối thủ tại đây, hoặc nạp file Excel (.xlsx) / Video (.mp4) từ máy tính..."></textarea>
                     
-                    <div id="refFileStatus" style="display:none; font-size:12px; color:var(--accent-gold); align-items:center; gap:6px; margin-top:4px;">
+                    <video id="refVideoPreview" controls style="display:none; width:100%; border-radius:8px; margin-top:6px; border:1px solid var(--border-color); max-height:160px; object-fit:cover;"></video>
+                    
+                    <div id="refFileStatus" style="display:none; font-size:12px; color:var(--accent-gold); align-items:center; gap:6px; margin-top:6px;">
                         <i class="fa-solid fa-file-circle-check"></i> <span id="refFileName">File đã nạp</span>
                         <i class="fa-solid fa-xmark" style="cursor:pointer; margin-left:auto;" onclick="clearRefFile()"></i>
                     </div>
@@ -1069,16 +1073,62 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             });
         }
 
-        // Handle file upload for reference script
+        // Handle file upload for reference script, excel, or video
         function handleRefFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             
+            const name = file.name.toLowerCase();
+            const statusEl = document.getElementById('refFileStatus');
+            const fileNameEl = document.getElementById('refFileName');
+            const videoPreviewEl = document.getElementById('refVideoPreview');
+            const scriptTextEl = document.getElementById('refScriptText');
+
+            statusEl.style.display = 'flex';
+            fileNameEl.innerText = file.name + ' (' + (file.size > 1048576 ? (file.size/1048576).toFixed(1) + ' MB' : Math.round(file.size/1024) + ' KB') + ')';
+
+            // Case 1: Direct Video File (.mp4, .mov, .webm, .avi)
+            if (file.type.startsWith('video/') || name.endsWith('.mp4') || name.endsWith('.mov') || name.endsWith('.webm') || name.endsWith('.avi')) {
+                const videoUrl = URL.createObjectURL(file);
+                videoPreviewEl.src = videoUrl;
+                videoPreviewEl.style.display = 'block';
+                scriptTextEl.value = `[FILE VIDEO THAM KHẢO TẢI TỪ MÁY TÍNH: ${file.name}]`;
+                window.uploadedRefVideoName = file.name;
+                return;
+            }
+
+            // Case 2: Excel File (.xlsx, .xls, .csv)
+            if (name.endsWith('.xlsx') || name.endsWith('.xls') || name.endsWith('.csv')) {
+                videoPreviewEl.style.display = 'none';
+                videoPreviewEl.src = '';
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        let fullText = "";
+                        workbook.SheetNames.forEach(sheetName => {
+                            const sheet = workbook.Sheets[sheetName];
+                            const csv = XLSX.utils.sheet_to_csv(sheet);
+                            if (csv.trim()) {
+                                fullText += `--- SHEET: ${sheetName} ---\n` + csv + "\n\n";
+                            }
+                        });
+                        scriptTextEl.value = fullText.trim();
+                    } catch (err) {
+                        alert("Không thể đọc file Excel. Vui lòng kiểm tra lại định dạng!");
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+                return;
+            }
+
+            // Case 3: Text / Markdown / JSON / Doc File
+            videoPreviewEl.style.display = 'none';
+            videoPreviewEl.src = '';
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('refScriptText').value = e.target.result;
-                document.getElementById('refFileStatus').style.display = 'flex';
-                document.getElementById('refFileName').innerText = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+                scriptTextEl.value = e.target.result;
             };
             reader.readAsText(file);
         }
@@ -1086,7 +1136,10 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
         function clearRefFile() {
             document.getElementById('refFileInput').value = '';
             document.getElementById('refScriptText').value = '';
+            document.getElementById('refVideoPreview').style.display = 'none';
+            document.getElementById('refVideoPreview').src = '';
             document.getElementById('refFileStatus').style.display = 'none';
+            window.uploadedRefVideoName = null;
         }
 
         // Call Gemini API
