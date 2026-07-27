@@ -1015,29 +1015,88 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             playNextChunk();
         }
 
-        // Export Storyboard to Excel (.xlsx) chuẩn Marketing 2 Phần
+        // Export Storyboard to Excel (.xlsx) chuẩn Master Template Marketing 4 Phần
         function exportToExcel() {
             if (!window.currentScenes || window.currentScenes.length === 0) {
                 alert("Chưa có kịch bản nào được tạo. Vui lòng bấm 'Tạo Kịch Bản' hoặc chọn kịch bản mẫu trước!");
                 return;
             }
 
-            const projectTitle = document.title.includes("Huế") ? "HUẾ HERITAGE" : "PENINSULA PRIVATE";
+            const isHue = document.title.includes("Huế");
+            const projectTitle = isHue ? "HUẾ HERITAGE" : "PENINSULA PRIVATE";
             const apartment = document.getElementById('apartmentType') ? document.getElementById('apartmentType').value : 'Căn Hộ Cao Cấp';
             const durationSelect = document.getElementById('duration') ? document.getElementById('duration').value : '60 giây';
+            const ctaValue = document.getElementById('message') && document.getElementById('message').value.trim() ? document.getElementById('message').value.trim() : "Đăng ký nhận Bảng giá đợt 1 / Ưu tiên chọn căn view đẹp / Liên hệ Hotline ngay";
+
+            const now = new Date();
+            const currentDateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+            const dueDate = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
+            const dueDateStr = `${dueDate.getDate()}/${dueDate.getMonth() + 1}/${dueDate.getFullYear()}`;
 
             const aoaData = [
-                // PHẦN 1: BẢNG YÊU CẦU CỤ THỂ (CAMPAIGN BRIEF HEADER)
-                ["Yêu cầu cụ thể", "Gợi ý / Thông tin chiến dịch"],
-                ["Kênh phân phối chính", "Facebook Ads, TikTok, YouTube Shorts, Instagram Reels"],
-                ["Độ dài VDO dự kiến", `${durationSelect} (Dự kiến 1:00 - 1:25)`],
-                ["Tỉ lệ khung hình", "Dọc 9:16 (TikTok/Reels/Shorts) & Vuông 1:1 / 3:4 (Facebook)"],
-                ["Call To Action (Kêu gọi hành động - BẮT BUỘC)", "Đăng ký nhận Bảng giá đợt 1 / Ưu tiên chọn căn view đẹp / Liên hệ Hotline ngay"],
-                ["Tài Nguyên Đính Kèm (Link Drive)", "(Dành cho Ekip điền link source quay Drive tại đây)"],
-                
-                [], // Hàng trống phân cách
+                // PHẦN 1: THÔNG TIN CƠ BẢN
+                ["Thông tin cơ bản", "", ""],
+                ["", "Người gửi yêu cầu", "Phòng Marketing"],
+                ["", "Ngày gửi yêu cầu", currentDateStr],
+                ["", "Ngày cần hoàn thành", dueDateStr],
+                ["", "Tên dự án", `${projectTitle} - ${apartment}`],
+                [],
 
-                // PHẦN 2: BANNER & BẢNG KỊCH BẢN PHÂN CẢNH CHI TIẾT
+                // PHẦN 2: YÊU CẦU CỤ THỂ
+                ["Yêu cầu cụ thể", "", "Gợi ý"],
+                ["", "Kênh phân phối chính", "Facebook Ads, YouTube, TikTok..."],
+                ["", "Độ dài VDO dự kiến", `${durationSelect} (Tùy chỉnh 45s - 1p30s)`],
+                ["", "Tỉ lệ khung hình", "Dọc 9:16 / Vuông 1:1 hoặc 3:4 (Facebook)"],
+                ["", "Call To Action (Kêu gọi hành động - BẮT BUỘC)", ctaValue],
+                ["", "Tài Nguyên Đính Kèm (Link Drive)", "https://drive.google.com/drive/folders/1T2Z_wMjWnyPGG25SN89PwcVGbyNKn7XU"],
+                [],
+
+                // PHẦN 3: YÊU CẦU KỊCH BẢN (CỐ ĐỊNH NỘI DUNG CHUẨN MẪU MARKETING)
+                ["Yêu cầu kịch bản", "", "", "", "", ""],
+                [
+                    "STT", 
+                    "Thời lượng (Dự kiến)", 
+                    "Thông điệp muốn gửi đến KH\n(Tạo ra những điểm chạm về cảm xúc)", 
+                    "Hình ảnh / Ghi chú quay (Visual)", 
+                    "TEXT TRÊN MÀN HÌNH", 
+                    "Nội dung Voice-over (VO)"
+                ],
+                [
+                    "1", 
+                    "[0:00 - 0:06]", 
+                    "Chạm vào “nỗi đau” hoặc sự tò mò của khách hàng: áp lực tài chính, sống chật chội, đầu tư không hiệu quả, mong muốn nâng tầm cuộc sống.", 
+                    "[Mô tả cụ thể hình ảnh tạo HOOK/Gây chú ý.]", 
+                    "Text ngắn, mạnh, tạo chú ý hoặc chạm đúng nỗi đau/vấn đề khách hàng đang gặp phải.", 
+                    "Lời thoại gây chú ý, Câu hỏi giật gân, thống kê gây sốc, hình ảnh/lợi ích độc quyền, hoặc một vấn đề lớn khách hàng đang gặp phải."
+                ],
+                [
+                    "2", 
+                    "[0:06 - 0:20]", 
+                    "Giúp khách hàng hình dung về một cuộc sống lý tưởng hơn: vị trí thuận tiện, không gian sống thư giãn, tiện ích đầy đủ cho gia đình.", 
+                    "[Mô tả: VD: Đồ họa vị trí, cảnh căn hộ mẫu (phòng khách).]", 
+                    "Text mô tả lợi ích sống, giá trị dự án hoặc tạo sự tò mò để giữ người xem tiếp tục theo dõi.", 
+                    "Kích thích sự tò mò, bắt đầu xây dựng bối cảnh. Giới thiệu dự án, vị trí, hoặc tiện ích như một giải pháp cho vấn đề ở trên. Cung cấp thông tin quan trọng."
+                ],
+                [
+                    "3", 
+                    "[0:20 - 0:45]", 
+                    "Đánh mạnh vào cảm xúc “mong muốn sở hữu”: cuộc sống đẳng cấp, an tâm tài chính, cơ hội đầu tư tăng giá, nơi đáng sống cho cả gia đình.", 
+                    "[Mô tả: VD: Cận cảnh tiện ích hồ bơi, đồ họa chính sách tài chính 0% Lãi suất.]", 
+                    "Text nhấn mạnh cảm xúc sở hữu, giá trị đầu tư, sự an tâm hoặc khác biệt nổi bật của dự án.", 
+                    "Nhấn mạnh những giá trị cảm xúc, lợi ích tài chính (lợi nhuận, chính sách), hoặc chất lượng sống mà dự án mang lại."
+                ],
+                [
+                    "4", 
+                    "[0:45 - Hết]", 
+                    "Tạo cảm giác cấp bách và thôi thúc hành động: quỹ căn giới hạn, ưu đãi hiếm có, cơ hội sở hữu ngay hôm nay trước khi bỏ lỡ.", 
+                    "[Mô tả: VD: Logo, Hotline chạy lớn, hình ảnh nhân viên tư vấn.]", 
+                    "Text mang tính kêu gọi hành động rõ ràng, tạo cảm giác cấp bách hoặc khan hiếm để thúc đẩy liên hệ.", 
+                    "[Lời thoại Kêu gọi Hành động rõ ràng, kèm yếu tố khan hiếm/cấp bách. Thúc đẩy người xem thực hiện bước tiếp theo (Đăng ký, Gọi Hotline).]"
+                ],
+                [],
+
+                // PHẦN 4: KỊCH BẢN CHI TIẾT (ĐỘNG - TỰ ĐỘNG ĐIỀN NỘI DUNG TỪ AI/CHIẾN DỊCH)
+                ["Kịch bản chi tiết", "", "", "", "", ""],
                 [`KỊCH BẢN CHI TIẾT - ${projectTitle} (${apartment})`],
                 [
                     "STT", 
@@ -1049,7 +1108,7 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
                 ]
             ];
 
-            // Nạp từng phân cảnh
+            // Nạp từng phân cảnh từ AI
             window.currentScenes.forEach((scene, index) => {
                 aoaData.push([
                     scene.stt || (index + 1),
@@ -1063,22 +1122,21 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
 
             const worksheet = XLSX.utils.aoa_to_sheet(aoaData);
 
-            // Cấu hình độ rộng cột tối ưu cho Marketing
+            // Cấu hình độ rộng cột tối ưu cho Master Template
             worksheet['!cols'] = [
-                { wch: 8 },   // STT
-                { wch: 16 },  // Thời lượng
-                { wch: 35 },  // Thông điệp cảm xúc
-                { wch: 55 },  // Hình ảnh / Ghi chú quay
-                { wch: 40 },  // Text trên màn hình
-                { wch: 55 }   // Nội dung VO
+                { wch: 10 },  // STT / Cột A
+                { wch: 20 },  // Thời lượng / Người gửi
+                { wch: 38 },  // Thông điệp / Giá trị
+                { wch: 55 },  // Visual / Gợi ý
+                { wch: 42 },  // Text Overlay
+                { wch: 55 }   // VO
             ];
 
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Kịch Bản Chi Tiết");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Form Kịch Bản Chi Tiết");
 
             const today = new Date().toISOString().split('T')[0];
-            const isHue = document.title.includes("Huế");
-            const filename = isHue ? `Kich_Ban_Marketing_Hue_Heritage_${today}.xlsx` : `Kich_Ban_Marketing_Peninsula_Private_${today}.xlsx`;
+            const filename = isHue ? `Form_Kich_Ban_Marketing_Hue_Heritage_${today}.xlsx` : `Form_Kich_Ban_Marketing_Peninsula_Private_${today}.xlsx`;
 
             XLSX.writeFile(workbook, filename);
         }
