@@ -1095,7 +1095,16 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
                 t: 's',
                 s: {
                     font: { name: "Calibri", size: 10, bold: isBold, color: { rgb: "C00000" } },
-                    alignment: { vertical: "center" }
+                    alignment: { vertical: "center", horizontal: "left", wrapText: false }
+                }
+            });
+
+            const cellPlainNoWrap = (val, isBold = false) => ({
+                v: val,
+                t: 's',
+                s: {
+                    font: { name: "Calibri", size: 10, bold: isBold, color: { rgb: "000000" } },
+                    alignment: { vertical: "center", horizontal: "left", wrapText: false }
                 }
             });
 
@@ -1190,12 +1199,12 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
 
             rows.push([]);
 
-            // --- SECTION 5: QUY TẮC PHỐI HỢP VÀ TỪ CHỐI TASK (CỐ ĐỊNH 100% TỪ ẢNH 2) ---
+            // --- SECTION 5: QUY TẮC PHỐI HỢP VÀ TỪ CHỐI TASK (CỐ ĐỊNH 100% TỪ ẢNH 2 - TRẢI DÀI KHÔNG XUỐNG DÒNG) ---
             rows.push([cellTitle("Quy tắc phối hợp và từ chối task")]);
-            rows.push([cellBorder("1. Yêu Cầu Bắt Buộc đối với Kinh doanh:", false, true)]);
-            rows.push([cellBorder("· Điền đầy đủ: Tất cả các mục đánh dấu (BẮT BUỘC) phải được điền chi tiết, không chung chung.")]);
-            rows.push([cellBorder("· Kịch bản logic: Kịch bản thô (Mục IV) phải có cấu trúc HOOK-CONTENT-CTA rõ ràng và tuân thủ thời lượng mục tiêu.")]);
-            rows.push([cellBorder("· Cung cấp Tài nguyên: Link Drive tài nguyên (Mục 16) phải được kiểm tra và đảm bảo hoạt động, chứa file chất lượng cao, mở quyền truy cập.")]);
+            rows.push([cellPlainNoWrap("1. Yêu Cầu Bắt Buộc đối với Kinh doanh:", true)]);
+            rows.push([cellPlainNoWrap("· Điền đầy đủ: Tất cả các mục đánh dấu (BẮT BUỘC) phải được điền chi tiết, không chung chung.")]);
+            rows.push([cellPlainNoWrap("· Kịch bản logic: Kịch bản thô (Mục IV) phải có cấu trúc HOOK-CONTENT-CTA rõ ràng và tuân thủ thời lượng mục tiêu.")]);
+            rows.push([cellPlainNoWrap("· Cung cấp Tài nguyên: Link Drive tài nguyên (Mục 16) phải được kiểm tra và đảm bảo hoạt động, chứa file chất lượng cao, mở quyền truy cập.")]);
             rows.push([cellRedText("2. Quyền của Bộ phận Marketing (TỪ CHỐI TASK):", true)]);
             rows.push([cellRedText("Bộ phận Marketing có quyền TỪ CHỐI tiếp nhận và thực hiện yêu cầu cho đến khi form được hoàn thiện chính xác, hoặc có quyền yêu cầu điều chỉnh nếu:")]);
             rows.push([cellRedText("1. Thiếu Mục Bắt Buộc/Thông tin chung chung: Bất kỳ mục nào được đánh dấu (BẮT BUỘC) bị bỏ trống hoặc thông tin không cụ thể.")]);
