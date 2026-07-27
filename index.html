@@ -1008,38 +1008,70 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             playNextChunk();
         }
 
-        // Export Storyboard to Excel (.xlsx)
+        // Export Storyboard to Excel (.xlsx) chuẩn Marketing 2 Phần
         function exportToExcel() {
             if (!window.currentScenes || window.currentScenes.length === 0) {
                 alert("Chưa có kịch bản nào được tạo. Vui lòng bấm 'Tạo Kịch Bản' hoặc chọn kịch bản mẫu trước!");
                 return;
             }
 
-            const dataForExcel = window.currentScenes.map(scene => ({
-                "STT Phân Cảnh": `Cảnh ${scene.stt}`,
-                "Thời Lượng": scene.duration || '0-3s',
-                "Thông Điệp / Điểm Chạm": scene.message || '',
-                "Hình Ảnh & Ghi Chú Quay (Visual Host)": scene.visual || '',
-                "Text Overlay (Chữ Màn Hình)": scene.textOverlay || '',
-                "Nội Dung Thoại VO (Host)": scene.vo || ''
-            }));
+            const projectTitle = document.title.includes("Huế") ? "HUẾ HERITAGE" : "PENINSULA PRIVATE";
+            const apartment = document.getElementById('apartmentType') ? document.getElementById('apartmentType').value : 'Căn Hộ Cao Cấp';
+            const durationSelect = document.getElementById('duration') ? document.getElementById('duration').value : '60 giây';
 
-            const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
-            
+            const aoaData = [
+                // PHẦN 1: BẢNG YÊU CẦU CỤ THỂ (CAMPAIGN BRIEF HEADER)
+                ["Yêu cầu cụ thể", "Gợi ý / Thông tin chiến dịch"],
+                ["Kênh phân phối chính", "Facebook Ads, TikTok, YouTube Shorts, Instagram Reels"],
+                ["Độ dài VDO dự kiến", `${durationSelect} (Dự kiến 1:00 - 1:25)`],
+                ["Tỉ lệ khung hình", "Dọc 9:16 (TikTok/Reels/Shorts) & Vuông 1:1 / 3:4 (Facebook)"],
+                ["Call To Action (Kêu gọi hành động - BẮT BUỘC)", "Đăng ký nhận Bảng giá đợt 1 / Ưu tiên chọn căn view đẹp / Liên hệ Hotline ngay"],
+                ["Tài Nguyên Đính Kèm (Link Drive)", "(Dành cho Ekip điền link source quay Drive tại đây)"],
+                
+                [], // Hàng trống phân cách
+
+                // PHẦN 2: BANNER & BẢNG KỊCH BẢN PHÂN CẢNH CHI TIẾT
+                [`KỊCH BẢN CHI TIẾT - ${projectTitle} (${apartment})`],
+                [
+                    "STT", 
+                    "Thời lượng", 
+                    "Thông điệp muốn gửi đến KH\n(Tạo ra những điểm chạm về cảm xúc)", 
+                    "Hình ảnh / Ghi chú quay (Visual)", 
+                    "TEXT TRÊN MÀN HÌNH", 
+                    "Nội dung Voice-over (VO)"
+                ]
+            ];
+
+            // Nạp từng phân cảnh
+            window.currentScenes.forEach((scene, index) => {
+                aoaData.push([
+                    scene.stt || (index + 1),
+                    scene.duration || "5 giây",
+                    scene.message || "",
+                    scene.visual || "",
+                    scene.textOverlay || "",
+                    scene.vo || ""
+                ]);
+            });
+
+            const worksheet = XLSX.utils.aoa_to_sheet(aoaData);
+
+            // Cấu hình độ rộng cột tối ưu cho Marketing
             worksheet['!cols'] = [
-                { wch: 14 },
-                { wch: 14 },
-                { wch: 32 },
-                { wch: 50 },
-                { wch: 38 },
-                { wch: 50 }
+                { wch: 8 },   // STT
+                { wch: 16 },  // Thời lượng
+                { wch: 35 },  // Thông điệp cảm xúc
+                { wch: 55 },  // Hình ảnh / Ghi chú quay
+                { wch: 40 },  // Text trên màn hình
+                { wch: 55 }   // Nội dung VO
             ];
 
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Kịch Bản Storyboard");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Kịch Bản Chi Tiết");
 
             const today = new Date().toISOString().split('T')[0];
-            const filename = `Kich_Ban_Hue_Heritage_${today}.xlsx`;
+            const isHue = document.title.includes("Huế");
+            const filename = isHue ? `Kich_Ban_Marketing_Hue_Heritage_${today}.xlsx` : `Kich_Ban_Marketing_Peninsula_Private_${today}.xlsx`;
 
             XLSX.writeFile(workbook, filename);
         }
