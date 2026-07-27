@@ -629,6 +629,27 @@
                 </div>
             </div>
 
+            <!-- Reference Benchmark Section -->
+            <div style="border-top: 1px dashed rgba(212, 175, 55, 0.2); padding-top: 14px; margin-top: 6px;">
+                <div class="form-group">
+                    <label style="color: var(--accent-gold); display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-solid fa-photo-film"></i> Mẫu Tham Khảo (Video / File Kịch Bản)</span>
+                        <span style="text-transform:none; opacity:0.8; font-weight:normal; cursor:pointer; font-size:11px;" onclick="document.getElementById('refFileInput').click()"><i class="fa-solid fa-upload"></i> Tải file</span>
+                    </label>
+                    
+                    <input type="file" id="refFileInput" accept=".txt,.md,.doc,.docx,.json" style="display:none;" onchange="handleRefFileUpload(event)">
+                    
+                    <input type="url" id="refVideoUrl" class="form-input" placeholder="Dán link Video mẫu (TikTok/Reels/YouTube)..." style="margin-bottom: 6px;">
+                    
+                    <textarea id="refScriptText" class="form-input" placeholder="Dán văn bản kịch bản mẫu đối thủ / style bạn thích tại đây, hoặc bấm Tải file (.txt, .md)..."></textarea>
+                    
+                    <div id="refFileStatus" style="display:none; font-size:12px; color:var(--accent-gold); align-items:center; gap:6px; margin-top:4px;">
+                        <i class="fa-solid fa-file-circle-check"></i> <span id="refFileName">File đã nạp</span>
+                        <i class="fa-solid fa-xmark" style="cursor:pointer; margin-left:auto;" onclick="clearRefFile()"></i>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="aiModel">Mô Hình Gemini AI</label>
                 <div class="select-wrapper">
@@ -1048,6 +1069,26 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             });
         }
 
+        // Handle file upload for reference script
+        function handleRefFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('refScriptText').value = e.target.result;
+                document.getElementById('refFileStatus').style.display = 'flex';
+                document.getElementById('refFileName').innerText = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+            };
+            reader.readAsText(file);
+        }
+
+        function clearRefFile() {
+            document.getElementById('refFileInput').value = '';
+            document.getElementById('refScriptText').value = '';
+            document.getElementById('refFileStatus').style.display = 'none';
+        }
+
         // Call Gemini API
         async function generateStoryboard() {
             const apiKey = atob(OBFUSCATED_KEY);
@@ -1058,9 +1099,20 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             const duration = document.getElementById('duration').value;
             const selectedModel = document.getElementById('aiModel') ? document.getElementById('aiModel').value : 'gemini-3.6-flash';
 
+            const refVideo = document.getElementById('refVideoUrl') ? document.getElementById('refVideoUrl').value.trim() : '';
+            const refScript = document.getElementById('refScriptText') ? document.getElementById('refScriptText').value.trim() : '';
+
             if (!target || !message || !hook) {
                 alert("Vui lòng điền đầy đủ thông tin chiến dịch (Target, Thông điệp, Ý tưởng Hook)!");
                 return;
+            }
+
+            let benchmarkInfo = "";
+            if (refVideo || refScript) {
+                benchmarkInfo = "\n\nMẪU THAM KHẢO HƯỚNG TỚI (BENCHMARK TARGET):\n";
+                if (refVideo) benchmarkInfo += `- Link Video Mẫu: ${refVideo}\n`;
+                if (refScript) benchmarkInfo += `- Kịch Bản Mẫu Tham Khảo:\n"""\n${refScript}\n"""\n`;
+                benchmarkInfo += "(Hãy học theo tông giọng, phong cách dẫn của Host và nhịp điệu Hook từ Mẫu Tham Khảo trên khi tạo kịch bản mới!).\n";
             }
 
             const statusIndicator = document.getElementById('statusIndicator');
@@ -1086,7 +1138,7 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
                     "Chỉ trả về đoạn prompt chiến lược bằng tiếng Việt.";
 
                 const csbhCanho = "Chính sách Huế Heritage: Booking 50 triệu (hoàn phí), CK đợt 1 đến 15% thanh toán nhanh, 0% lãi suất vay 70% từ 18-24 tháng, tặng thẻ Royal Heritage Club.";
-                const userMsg1 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nCHIEN DICH CAN VIET KICH BAN:\nLoai san pham: ${apartment}\nCSBH: ${csbhCanho}\nTarget doi tuong: ${target}\nThong diep: ${message}\nHook: ${hook}\nThoi luong: ${duration}`;
+                const userMsg1 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nCHIEN DICH CAN VIET KICH BAN:\nLoai san pham: ${apartment}\nCSBH: ${csbhCanho}\nTarget doi tuong: ${target}\nThong diep: ${message}\nHook: ${hook}\nThoi luong: ${duration}${benchmarkInfo}`;
 
                 const promptChuan = await callGeminiAPI(sysAssistant1, userMsg1, apiKey, selectedModel);
 
@@ -1100,7 +1152,7 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
                     "Xuat DUNG MOT JSON ARRAY [] voi 6-8 phan canh. Moi phan canh co dung 6 truong (stt, duration, message, visual, textOverlay, vo).\n" +
                     "YEU CAU TUYET DOI: Chi tra ve JSON thuan bat dau [ va ket thuc ]. Khong dung markdown, khong chu thich ngoai JSON.";
 
-                const userMsg2 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nPROMPT CHIEN LUOC TU ASSIST ASSISTANT 1:\n${promptChuan}`;
+                const userMsg2 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nPROMPT CHIEN LUOC TU ASSIST ASSISTANT 1:\n${promptChuan}${benchmarkInfo}`;
 
                 const jsonRaw = await callGeminiAPI(sysCreator, userMsg2, apiKey, selectedModel);
                 
