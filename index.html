@@ -13,8 +13,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=2.0">
-    <!-- SheetJS for Excel (.xlsx, .xls, .csv) parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js?v=2.0"></script>
+    <!-- SheetJS with full styling support for colors, borders, and fonts -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
     <style>
         :root {
@@ -1015,7 +1015,7 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             playNextChunk();
         }
 
-        // Export Storyboard to Excel (.xlsx) chuẩn Master Template Marketing 4 Phần
+        // Export Storyboard to Excel (.xlsx) chuẩn Master Template Marketing với Màu sắc & Định dạng 100%
         function exportToExcel() {
             if (!window.currentScenes || window.currentScenes.length === 0) {
                 alert("Chưa có kịch bản nào được tạo. Vui lòng bấm 'Tạo Kịch Bản' hoặc chọn kịch bản mẫu trước!");
@@ -1026,110 +1026,209 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             const projectTitle = isHue ? "HUẾ HERITAGE" : "PENINSULA PRIVATE";
             const apartment = document.getElementById('apartmentType') ? document.getElementById('apartmentType').value : 'Căn Hộ Cao Cấp';
             const durationSelect = document.getElementById('duration') ? document.getElementById('duration').value : '60 giây';
-            const ctaValue = document.getElementById('message') && document.getElementById('message').value.trim() ? document.getElementById('message').value.trim() : "Đăng ký nhận Bảng giá đợt 1 / Ưu tiên chọn căn view đẹp / Liên hệ Hotline ngay";
+            const ctaValue = document.getElementById('message') && document.getElementById('message').value.trim() ? document.getElementById('message').value.trim() : "Đăng ký nhận Bảng giá đợt 1 / Liên hệ Hotline [SỐ] ngay";
 
             const now = new Date();
             const currentDateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
             const dueDate = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
             const dueDateStr = `${dueDate.getDate()}/${dueDate.getMonth() + 1}/${dueDate.getFullYear()}`;
 
-            const aoaData = [
-                // PHẦN 1: THÔNG TIN CƠ BẢN
-                ["Thông tin cơ bản", "", ""],
-                ["", "Người gửi yêu cầu", "Phòng Marketing"],
-                ["", "Ngày gửi yêu cầu", currentDateStr],
-                ["", "Ngày cần hoàn thành", dueDateStr],
-                ["", "Tên dự án", `${projectTitle} - ${apartment}`],
-                [],
+            // Style Definitions
+            const borderThin = {
+                top: { style: "thin", color: { rgb: "000000" } },
+                bottom: { style: "thin", color: { rgb: "000000" } },
+                left: { style: "thin", color: { rgb: "000000" } },
+                right: { style: "thin", color: { rgb: "000000" } }
+            };
 
-                // PHẦN 2: YÊU CẦU CỤ THỂ
-                ["Yêu cầu cụ thể", "", "Gợi ý"],
-                ["", "Kênh phân phối chính", "Facebook Ads, YouTube, TikTok..."],
-                ["", "Độ dài VDO dự kiến", `${durationSelect} (Tùy chỉnh 45s - 1p30s)`],
-                ["", "Tỉ lệ khung hình", "Dọc 9:16 / Vuông 1:1 hoặc 3:4 (Facebook)"],
-                ["", "Call To Action (Kêu gọi hành động - BẮT BUỘC)", ctaValue],
-                ["", "Tài Nguyên Đính Kèm (Link Drive)", "https://drive.google.com/drive/folders/1T2Z_wMjWnyPGG25SN89PwcVGbyNKn7XU"],
-                [],
+            const fontCalibri = { name: "Calibri", size: 10 };
+            const fontBold = { name: "Calibri", size: 10, bold: true };
+            const fontHeader = { name: "Calibri", size: 11, bold: true };
 
-                // PHẦN 3: YÊU CẦU KỊCH BẢN (CỐ ĐỊNH NỘI DUNG CHUẨN MẪU MARKETING)
-                ["Yêu cầu kịch bản", "", "", "", "", ""],
-                [
-                    "STT", 
-                    "Thời lượng (Dự kiến)", 
-                    "Thông điệp muốn gửi đến KH\n(Tạo ra những điểm chạm về cảm xúc)", 
-                    "Hình ảnh / Ghi chú quay (Visual)", 
-                    "TEXT TRÊN MÀN HÌNH", 
-                    "Nội dung Voice-over (VO)"
-                ],
-                [
-                    "1", 
-                    "[0:00 - 0:06]", 
-                    "Chạm vào “nỗi đau” hoặc sự tò mò của khách hàng: áp lực tài chính, sống chật chội, đầu tư không hiệu quả, mong muốn nâng tầm cuộc sống.", 
-                    "[Mô tả cụ thể hình ảnh tạo HOOK/Gây chú ý.]", 
-                    "Text ngắn, mạnh, tạo chú ý hoặc chạm đúng nỗi đau/vấn đề khách hàng đang gặp phải.", 
-                    "Lời thoại gây chú ý, Câu hỏi giật gân, thống kê gây sốc, hình ảnh/lợi ích độc quyền, hoặc một vấn đề lớn khách hàng đang gặp phải."
-                ],
-                [
-                    "2", 
-                    "[0:06 - 0:20]", 
-                    "Giúp khách hàng hình dung về một cuộc sống lý tưởng hơn: vị trí thuận tiện, không gian sống thư giãn, tiện ích đầy đủ cho gia đình.", 
-                    "[Mô tả: VD: Đồ họa vị trí, cảnh căn hộ mẫu (phòng khách).]", 
-                    "Text mô tả lợi ích sống, giá trị dự án hoặc tạo sự tò mò để giữ người xem tiếp tục theo dõi.", 
-                    "Kích thích sự tò mò, bắt đầu xây dựng bối cảnh. Giới thiệu dự án, vị trí, hoặc tiện ích như một giải pháp cho vấn đề ở trên. Cung cấp thông tin quan trọng."
-                ],
-                [
-                    "3", 
-                    "[0:20 - 0:45]", 
-                    "Đánh mạnh vào cảm xúc “mong muốn sở hữu”: cuộc sống đẳng cấp, an tâm tài chính, cơ hội đầu tư tăng giá, nơi đáng sống cho cả gia đình.", 
-                    "[Mô tả: VD: Cận cảnh tiện ích hồ bơi, đồ họa chính sách tài chính 0% Lãi suất.]", 
-                    "Text nhấn mạnh cảm xúc sở hữu, giá trị đầu tư, sự an tâm hoặc khác biệt nổi bật của dự án.", 
-                    "Nhấn mạnh những giá trị cảm xúc, lợi ích tài chính (lợi nhuận, chính sách), hoặc chất lượng sống mà dự án mang lại."
-                ],
-                [
-                    "4", 
-                    "[0:45 - Hết]", 
-                    "Tạo cảm giác cấp bách và thôi thúc hành động: quỹ căn giới hạn, ưu đãi hiếm có, cơ hội sở hữu ngay hôm nay trước khi bỏ lỡ.", 
-                    "[Mô tả: VD: Logo, Hotline chạy lớn, hình ảnh nhân viên tư vấn.]", 
-                    "Text mang tính kêu gọi hành động rõ ràng, tạo cảm giác cấp bách hoặc khan hiếm để thúc đẩy liên hệ.", 
-                    "[Lời thoại Kêu gọi Hành động rõ ràng, kèm yếu tố khan hiếm/cấp bách. Thúc đẩy người xem thực hiện bước tiếp theo (Đăng ký, Gọi Hotline).]"
-                ],
-                [],
+            const cellTitle = (val) => ({ v: val, t: 's', s: { font: fontHeader } });
+            
+            const cellBorder = (val, isCenter = false, bold = false) => ({
+                v: val !== undefined && val !== null ? String(val) : "",
+                t: 's',
+                s: {
+                    font: bold ? fontBold : fontCalibri,
+                    alignment: { vertical: "center", horizontal: isCenter ? "center" : "left", wrapText: true },
+                    border: borderThin
+                }
+            });
 
-                // PHẦN 4: KỊCH BẢN CHI TIẾT (ĐỘNG - TỰ ĐỘNG ĐIỀN NỘI DUNG TỪ AI/CHIẾN DỊCH)
-                ["Kịch bản chi tiết", "", "", "", "", ""],
-                [`KỊCH BẢN CHI TIẾT - ${projectTitle} (${apartment})`],
-                [
-                    "STT", 
-                    "Thời lượng", 
-                    "Thông điệp muốn gửi đến KH\n(Tạo ra những điểm chạm về cảm xúc)", 
-                    "Hình ảnh / Ghi chú quay (Visual)", 
-                    "TEXT TRÊN MÀN HÌNH", 
-                    "Nội dung Voice-over (VO)"
-                ]
-            ];
+            const cellYellow = (val, isCenter = true) => ({
+                v: val !== undefined && val !== null ? String(val) : "",
+                t: 's',
+                s: {
+                    fill: { fgColor: { rgb: "FFFF00" } },
+                    font: fontBold,
+                    alignment: { vertical: "center", horizontal: isCenter ? "center" : "left", wrapText: true },
+                    border: borderThin
+                }
+            });
 
-            // Nạp từng phân cảnh từ AI
+            const cellPinkHeader = (val) => ({
+                v: val,
+                t: 's',
+                s: {
+                    fill: { fgColor: { rgb: "E8DAEF" } }, // Light Pink/Lavender
+                    font: fontHeader,
+                    alignment: { vertical: "center", horizontal: "center", wrapText: true },
+                    border: borderThin
+                }
+            });
+
+            const cellOrangeBanner = (val) => ({
+                v: val,
+                t: 's',
+                s: {
+                    fill: { fgColor: { rgb: "ED7D31" } }, // Vibrant Orange
+                    font: { name: "Calibri", size: 11, bold: true, color: { rgb: "000000" } },
+                    alignment: { vertical: "center", horizontal: "left" },
+                    border: borderThin
+                }
+            });
+
+            const cellRedText = (val, isBold = false) => ({
+                v: val,
+                t: 's',
+                s: {
+                    font: { name: "Calibri", size: 10, bold: isBold, color: { rgb: "C00000" } },
+                    alignment: { vertical: "center" }
+                }
+            });
+
+            const rows = [];
+
+            // --- SECTION 1: THÔNG TIN CƠ BẢN ---
+            rows.push([cellTitle("Thông tin cơ bản"), cellTitle(""), cellTitle("")]);
+            rows.push([cellTitle(""), cellBorder("Người gửi yêu cầu", false, true), cellBorder("Phòng Marketing")]);
+            rows.push([cellTitle(""), cellBorder("Ngày gửi yêu cầu", false, true), cellYellow(currentDateStr, false)]);
+            rows.push([cellTitle(""), cellBorder("Ngày cần hoàn thành", false, true), cellYellow(dueDateStr, false)]);
+            rows.push([cellTitle(""), cellBorder("Tên dự án", false, true), cellBorder(`${projectTitle} - ${apartment}`)]);
+            rows.push([]);
+
+            // --- SECTION 2: YÊU CẦU CỤ THỂ ---
+            rows.push([cellTitle("Yêu cầu cụ thể"), cellTitle(""), cellBorder("Gợi ý", true, true)]);
+            rows.push([cellTitle(""), cellBorder("Kênh phân phối chính", false, true), cellYellow("Facebook Ads, YouTube, TikTok..."), cellBorder("(Facebook Ads, YouTube, TikTok,..)")]);
+            rows.push([cellTitle(""), cellBorder("Độ dài VDO dự kiến", false, true), cellYellow(durationSelect), cellBorder("1:15-1:25")]);
+            rows.push([cellTitle(""), cellBorder("Tỉ lệ khung hình", false, true), cellYellow("Dọc 9:16 / Vuông 1:1 hoặc 3:4"), cellBorder("Vuông hoặc 3:4 (Facebook)")]);
+            rows.push([cellTitle(""), cellBorder("Call To Action (Kêu gọi hành động - BẮT BUỘC)", false, true), cellYellow(ctaValue), cellBorder("(Phải rõ ràng. VD: Đăng ký nhận Bảng giá / Liên hệ Hotline [SỐ] ngay)")]);
+            rows.push([cellTitle(""), cellBorder("Tài Nguyên Đính Kèm (Link Drive)", false, true), cellYellow(""), cellBorder("https://drive.google.com/drive/folders/1T2Z_wMjWnyPGG25SN89PwcVGbyNKn7XU")]);
+            rows.push([]);
+
+            // --- SECTION 3: YÊU CẦU KỊCH BẢN (CỐ ĐỊNH 100% TỪ MẪU) ---
+            rows.push([cellTitle("Yêu cầu kịch bản")]);
+            rows.push([
+                cellPinkHeader("STT"),
+                cellPinkHeader("Thời lượng\n(Dự kiến)"),
+                cellPinkHeader("Thông điệp muốn gửi đến KH\n(Tạo ra những điểm chạm về cảm xúc)"),
+                cellPinkHeader("Hình ảnh / Ghi chú quay (Visual)"),
+                cellPinkHeader("TEXT TRÊN MÀN HÌNH"),
+                cellPinkHeader("Nội dung Voice-over (VO)")
+            ]);
+            rows.push([
+                cellBorder("1", true),
+                cellBorder("[0:00 - 0:06]", true),
+                cellBorder("Chạm vào “nỗi đau” hoặc sự tò mò của khách hàng: áp lực tài chính, sống chật chội, đầu tư không hiệu quả, mong muốn nâng tầm cuộc sống."),
+                cellBorder("[Mô tả cụ thể hình ảnh tạo HOOK/Gây chú ý.]"),
+                cellBorder("Text ngắn, mạnh, tạo chú ý hoặc chạm đúng nỗi đau/vấn đề khách hàng đang gặp phải."),
+                cellBorder("Lời thoại gây chú ý, Câu hỏi giật gân, thống kê gây sốc, hình ảnh/lợi ích độc quyền, hoặc một vấn đề lớn khách hàng đang gặp phải.")
+            ]);
+            rows.push([
+                cellBorder("2", true),
+                cellBorder("[0:06 - 0:20]", true),
+                cellBorder("Giúp khách hàng hình dung về một cuộc sống lý tưởng hơn: vị trí thuận tiện, không gian sống thư giãn, tiện ích đầy đủ cho gia đình."),
+                cellBorder("[Mô tả: VD: Đồ họa vị trí, cảnh căn hộ mẫu (phòng khách).]"),
+                cellBorder("Text mô tả lợi ích sống, giá trị dự án hoặc tạo sự tò mò để giữ người xem tiếp tục theo dõi."),
+                cellBorder("Kích thích sự tò mò, bắt đầu xây dựng bối cảnh. Giới thiệu dự án, vị trí, hoặc tiện ích như một giải pháp cho vấn đề ở trên. Cung cấp thông tin quan trọng.")
+            ]);
+            rows.push([
+                cellBorder("3", true),
+                cellBorder("[0:20 - 0:45]", true),
+                cellBorder("Đánh mạnh vào cảm xúc “mong muốn sở hữu”: cuộc sống đẳng cấp, an tâm tài chính, cơ hội đầu tư tăng giá, nơi đáng sống cho cả gia đình."),
+                cellBorder("[Mô tả: VD: Cận cảnh tiện ích hồ bơi, đồ họa chính sách tài chính 0% Lãi suất.]"),
+                cellBorder("Text nhấn mạnh cảm xúc sở hữu, giá trị đầu tư, sự an tâm hoặc khác biệt nổi bật của dự án."),
+                cellBorder("Nhấn mạnh những giá trị cảm xúc, lợi ích tài chính (lợi nhuận, chính sách), hoặc chất lượng sống mà dự án mang lại.")
+            ]);
+            rows.push([
+                cellBorder("4", true),
+                cellBorder("[0:45 - Hết]", true),
+                cellBorder("Tạo cảm giác cấp bách và thôi thúc hành động: quỹ căn giới hạn, ưu đãi hiếm có, cơ hội sở hữu ngay hôm nay trước khi bỏ lỡ."),
+                cellBorder("[Mô tả: VD: Logo, Hotline chạy lớn, hình ảnh nhân viên tư vấn.]"),
+                cellBorder("Text mang tính kêu gọi hành động rõ ràng, tạo cảm giác cấp bách hoặc khan hiếm để thúc đẩy liên hệ."),
+                cellBorder("[Lời thoại Kêu gọi Hành động rõ ràng, kèm yếu tố khan hiếm/cấp bách. Thúc đẩy người xem thực hiện bước tiếp theo (Đăng ký, Gọi Hotline).]")
+            ]);
+            rows.push([]);
+
+            // --- SECTION 4: KỊCH BẢN CHI TIẾT (ĐỘNG TỪ AI) ---
+            rows.push([cellTitle("Kịch bản chi tiết")]);
+            rows.push([
+                cellOrangeBanner(`KỊCH BẢN CHI TIẾT - ${projectTitle} (${apartment})`),
+                cellOrangeBanner(""), cellOrangeBanner(""), cellOrangeBanner(""), cellOrangeBanner(""), cellOrangeBanner("")
+            ]);
+            rows.push([
+                cellPinkHeader("STT"),
+                cellPinkHeader("Thời lượng"),
+                cellPinkHeader("Thông điệp muốn gửi đến KH\n(Tạo ra những điểm chạm về cảm xúc)"),
+                cellPinkHeader("Hình ảnh / Ghi chú quay (Visual)"),
+                cellPinkHeader("TEXT TRÊN MÀN HÌNH"),
+                cellPinkHeader("Nội dung Voice-over (VO)")
+            ]);
+
             window.currentScenes.forEach((scene, index) => {
-                aoaData.push([
-                    scene.stt || (index + 1),
-                    scene.duration || "5 giây",
-                    scene.message || "",
-                    scene.visual || "",
-                    scene.textOverlay || "",
-                    scene.vo || ""
+                rows.push([
+                    cellYellow(scene.stt || (index + 1), true),
+                    cellYellow(scene.duration || "5 giây", true),
+                    cellBorder(scene.message || ""),
+                    cellBorder(scene.visual || ""),
+                    cellBorder(scene.textOverlay || ""),
+                    cellBorder(scene.vo || "")
                 ]);
             });
 
-            const worksheet = XLSX.utils.aoa_to_sheet(aoaData);
+            rows.push([]);
 
-            // Cấu hình độ rộng cột tối ưu cho Master Template
+            // --- SECTION 5: QUY TẮC PHỐI HỢP VÀ TỪ CHỐI TASK (CỐ ĐỊNH 100% TỪ ẢNH 2) ---
+            rows.push([cellTitle("Quy tắc phối hợp và từ chối task")]);
+            rows.push([cellBorder("1. Yêu Cầu Bắt Buộc đối với Kinh doanh:", false, true)]);
+            rows.push([cellBorder("· Điền đầy đủ: Tất cả các mục đánh dấu (BẮT BUỘC) phải được điền chi tiết, không chung chung.")]);
+            rows.push([cellBorder("· Kịch bản logic: Kịch bản thô (Mục IV) phải có cấu trúc HOOK-CONTENT-CTA rõ ràng và tuân thủ thời lượng mục tiêu.")]);
+            rows.push([cellBorder("· Cung cấp Tài nguyên: Link Drive tài nguyên (Mục 16) phải được kiểm tra và đảm bảo hoạt động, chứa file chất lượng cao, mở quyền truy cập.")]);
+            rows.push([cellRedText("2. Quyền của Bộ phận Marketing (TỪ CHỐI TASK):", true)]);
+            rows.push([cellRedText("Bộ phận Marketing có quyền TỪ CHỐI tiếp nhận và thực hiện yêu cầu cho đến khi form được hoàn thiện chính xác, hoặc có quyền yêu cầu điều chỉnh nếu:")]);
+            rows.push([cellRedText("1. Thiếu Mục Bắt Buộc/Thông tin chung chung: Bất kỳ mục nào được đánh dấu (BẮT BUỘC) bị bỏ trống hoặc thông tin không cụ thể.")]);
+            rows.push([cellRedText("2. Kịch bản Thiếu Sức Hút (Chưa đạt chuẩn Marketing):")]);
+            rows.push([cellRedText("o HOOK yếu: Kịch bản thiếu yếu tố gây chú ý, không rõ ràng trong 6 giây đầu (Vi phạm tiêu chuẩn A-Attention).")]);
+            rows.push([cellRedText("o Key Message Mờ nhạt: Nội dung VO và Thông điệp Chính (Mục 14) thiếu lợi ích cụ thể hoặc không có bảo chứng để thuyết phục khách hàng.")]);
+            rows.push([cellRedText("3. Chất lượng Tài nguyên Không Đạt Chuẩn:")]);
+            rows.push([cellRedText("o Thiếu Tài nguyên (Mục 16): Link bị lỗi hoặc tài liệu không đủ.")]);
+            rows.push([cellRedText("o Tiêu chuẩn trang phục và hình ảnh của chuyên viên kinh doanh không gọn gàng và chuẩn chỉnh")]);
+            rows.push([cellRedText("o Chất lượng Hình ảnh/Video Thô kém: Hình ảnh hoặc video thô (RAW) do Kinh doanh cung cấp có độ phân giải quá thấp, mờ, rung lắc, âm thanh voice không đạt không thể chỉnh sửa, hoặc âm thanh môi trường quá nhiều")]);
+
+            // Create SheetJS Worksheet object
+            const worksheet = {};
+            rows.forEach((row, rIdx) => {
+                row.forEach((cell, cIdx) => {
+                    if (cell && cell.v !== undefined) {
+                        const cellRef = XLSX.utils.encode_cell({ r: rIdx, c: cIdx });
+                        worksheet[cellRef] = cell;
+                    }
+                });
+            });
+
+            const maxRow = rows.length;
+            worksheet['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: maxRow - 1, c: 5 } });
+
+            // Exact Column Widths
             worksheet['!cols'] = [
                 { wch: 10 },  // STT / Cột A
-                { wch: 20 },  // Thời lượng / Người gửi
-                { wch: 38 },  // Thông điệp / Giá trị
-                { wch: 55 },  // Visual / Gợi ý
-                { wch: 42 },  // Text Overlay
-                { wch: 55 }   // VO
+                { wch: 22 },  // Thời lượng / Trường Cột B
+                { wch: 45 },  // Thông điệp / Cột C
+                { wch: 55 },  // Visual / Gợi ý Cột D
+                { wch: 45 },  // Text Overlay Cột E
+                { wch: 60 }   // VO Cột F
             ];
 
             const workbook = XLSX.utils.book_new();
