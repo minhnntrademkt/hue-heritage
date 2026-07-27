@@ -960,7 +960,9 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
                 }
 
                 const encodeText = encodeURIComponent(chunks[currentChunkIndex]);
-                const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeText}&tl=vi&client=tw-ob`;
+                const ttsUrl = window.location.protocol.startsWith('http') 
+                    ? `/api/tts?text=${encodeText}`
+                    : `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeText}&tl=vi&client=tw-ob`;
 
                 const audio = new Audio(ttsUrl);
                 element.currentAudio = audio;
