@@ -683,9 +683,10 @@
             </div>
 
             <div class="form-group">
-                <label for="aiModel">Mô Hình Gemini AI</label>
+                <label for="aiModel">Mô Hình AI Sáng Tạo</label>
                 <div class="select-wrapper">
                     <select id="aiModel" class="form-input">
+                        <option value="claude-3.5-sonnet">Claude 3.5 Sonnet (Chuyên Gia Copywriting Đẳng Cấp)</option>
                         <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash (Mới nhất & Nhanh nhất)</option>
                         <option value="gemini-3.5-flash">Gemini 3.5 Flash (Tiêu chuẩn)</option>
                         <option value="gemini-3.1-pro">Gemini 3.1 Pro (Chuyên sâu)</option>
@@ -707,6 +708,10 @@
             <div class="samples-section">
                 <h4>Kịch bản mẫu Huế Heritage (Xem ngay)</h4>
                 <div class="sample-buttons">
+                    <button class="sample-btn" style="border: 1px solid var(--accent-gold); background: rgba(212, 175, 55, 0.15);" onclick="loadSample('claude_heritage')">
+                        <span><i class="fa-solid fa-brain" style="color:var(--accent-gold);"></i> 🤖 Claude 3.5 Sonnet – Gia Sản Hoàng Gia</span>
+                        <i class="fa-solid fa-chevron-right" style="color:var(--accent-gold);"></i>
+                    </button>
                     <button class="sample-btn" onclick="loadSample('vinhquy')">
                         <span><i class="fa-solid fa-torii-gate"></i> Vinh Quy Bái Tổ (Xứ Huế)</span>
                         <i class="fa-solid fa-chevron-right"></i>
@@ -781,6 +786,64 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
 
         // Preloaded Demos for Huế Heritage (Chuẩn Marketing 4 Giai Đoạn)
         const STATIC_DEMOS = {
+            claude_heritage: [
+                {
+                    stt: 1,
+                    duration: "3 giây",
+                    message: "🧠 CLAUDE PATTERN INTERRUPT – Chạm vào bản năng sở hữu gia sản và nỗi sợ bị bỏ lỡ điều hiếm có một lần trong đời.",
+                    visual: "Cú cắt đột ngột: Đặc tả bàn tay người đàn ông trung niên lật giở cuốn gia phả cũ kỹ. Nét chữ Hán Nôm mờ dần chuyển thành ánh đèn vàng lung linh từ ban công Sky Villa Huế Heritage nhìn ra sông Hương đêm.",
+                    textOverlay: "3 ĐỜI – 1 QUYẾT ĐỊNH",
+                    vo: "Ông nội bạn đã bỏ lỡ. Cha bạn cũng bỏ lỡ. Còn bạn?"
+                },
+                {
+                    stt: 2,
+                    duration: "5 giây",
+                    message: "⚡ HOOK SÂU – Gây sốc nhận thức bằng câu hỏi triết học ngắn gọn để buộc người xem không thể cuộn tiếp.",
+                    visual: "Host nhìn thẳng vào camera với ánh mắt điềm tĩnh, tự tin. Hậu cảnh là cầu Tràng Tiền nhuộm vàng hoàng hôn rực rỡ phản chiếu lấp lánh trên mặt sông Hương. Zoom chậm 2x vào khuôn mặt host.",
+                    textOverlay: "Bao nhiêu thế hệ đủ để tạo ra một gia sản thực sự?",
+                    vo: "Người ta nói phải ba đời mới thành gia tộc... Nhưng ở Cố Đô Huế này — một quyết định đúng đắn có thể rút ngắn điều đó xuống còn một."
+                },
+                {
+                    stt: 3,
+                    duration: "8 giây",
+                    message: "🏙️ GIẢI PHÁP & VỊ TRÍ – Chứng minh Huế Heritage là bất động sản di sản 'tuyệt bản' không thể tái tạo, khắc hoạ vị thế đắc địa chỉ xuất hiện một lần trong lịch sử đô thị.",
+                    visual: "Cảnh flycam 4K mượt mà từ cao độ 300m đổ xuống theo đường cong sông Hương, lia vào tổ hợp Huế Heritage. Xuất hiện các điểm nối động: Đại Nội 5 phút – Chùa Thiên Mụ 7 phút – Cầu Tràng Tiền 3 phút.",
+                    textOverlay: "KỀ BÊN SÔNG HƯƠNG\nTRÁI TIM CỐ ĐÔ\nKHÔNG BAO GIỜ LẶP LẠI",
+                    vo: "Huế Heritage không chỉ là căn hộ. Đây là mảnh đất kề bên dòng sông Hương linh thiêng — vị trí mà Cố Đô ngàn năm chỉ trao một lần, không bao giờ có lần hai."
+                },
+                {
+                    stt: 4,
+                    duration: "10 giây",
+                    message: "🏛️ KIẾN TRÚC & TRẢI NGHIỆM – Kể câu chuyện sống bằng giác quan: thị giác, xúc giác, cảm xúc. Host là nhân chứng sống của đặc quyền hoàng gia.",
+                    visual: "Host đặt lòng bàn tay lên mặt kính Low-E 27.5mm — máy quay cận cảnh chi tiết vân gỗ Rosewood tự nhiên. Cắt sang cảnh rộng: căn Sky Villa 350m² tràn ngập ánh sáng vàng buổi chiều, view 180° sông Hương trực tiếp qua kính từ sàn đến trần.",
+                    textOverlay: "SKY VILLA – 350M²\nKÍNH LOW-E CÁCH ÂM TOÀN PHẦN\nGỖ TỰ NHIÊN & ĐÁ MARBLE NHẬP KHẨU\nVIEW 180° SÔNG HƯƠNG",
+                    vo: "Đây là không gian mà ánh sáng sông Hương chiếu qua từng sáng sớm... và tiếng chuông chùa Thiên Mụ vẳng lại mỗi bình minh. Đây là ký ức mà con cháu bạn sẽ nhớ về bạn — mãi mãi."
+                },
+                {
+                    stt: 5,
+                    duration: "8 giây",
+                    message: "💰 TÀI CHÍNH & ĐÒN BẨY – Phá vỡ rào cản tâm lý 'chưa đủ tài chính' bằng con số thuyết phục. Biến giấc mơ thành kế hoạch có thể thực hiện ngay hôm nay.",
+                    visual: "Đồ họa motion infographic thanh lịch trên nền tối: Booking 50 triệu → Chiết khấu 15% → Vay 70% ngân hàng → 0% lãi suất 24 tháng. Host gật đầu xác nhận, giơ ngón cái.",
+                    textOverlay: "BOOKING CHỈ 50 TRIỆU\nCHIẾT KHẤU ĐỢT 1 ĐẾN 15%\nVAY 70% | 0% LÃI SUẤT 24 THÁNG\nTHẺ ROYAL HERITAGE CLUB – TRỌN ĐỜI",
+                    vo: "Chỉ 50 triệu để giữ chỗ. Ngân hàng hỗ trợ 70% với 0% lãi suất đến 24 tháng. Chiết khấu đợt 1 lên đến 15%. Và thẻ thành viên Royal Heritage Club — đặc quyền trọn đời dành cho bạn và gia tộc."
+                },
+                {
+                    stt: 6,
+                    duration: "6 giây",
+                    message: "⏳ KHAN HIẾM & CẤP BÁCH – Tạo áp lực quyết định thực sự bằng ngôn ngữ khan hiếm tuyệt đối, không phóng đại, không thao túng — chỉ là sự thật đau đớn về cơ hội bị bỏ lỡ.",
+                    visual: "Màn hình đếm ngược: số lượng căn Sky Villa còn lại. Host nhìn thẳng camera, giọng trầm và chậm rãi đầy trọng lượng.",
+                    textOverlay: "GIỎ HÀNG SKY VILLA\nCHỈ CÒN LẠI\n[SỐ HỮU HẠN] CĂN\nĐỢT 1 – TRỰC TIẾP CĐT",
+                    vo: "Không có đợt 2 nào cho vị trí này. Không có cơ hội thứ hai nào trên mảnh đất ven sông Hương này. Đây là lần cuối cùng bạn có thể chọn căn đẹp nhất từ chủ đầu tư."
+                },
+                {
+                    stt: 7,
+                    duration: "5 giây",
+                    message: "📞 CTA – Kêu gọi hành động nhẹ nhàng nhưng khẩn trương. Không ép buộc — mà trao quyền quyết định cho người xem với cảm giác tự chủ.",
+                    visual: "Host mỉm cười ấm áp, ngả người ra lan can Sky Villa với khung cảnh sông Hương đằng sau đẹp như tranh vẽ. Logo Huế Heritage xuất hiện phủ nhẹ góc phải. Số Hotline chạy lớn dạng đồ họa vàng kim.",
+                    textOverlay: "ĐĂNG KÝ NGAY\nNHẬN BẢNG GIÁ + CHỌN CĂN VIEW ĐẸP\nHotline: 090x.xxx.xxx",
+                    vo: "Nhắn tin hoặc gọi ngay Hotline để nhận bảng giá đợt 1 và được tư vấn chọn căn view sông Hương đẹp nhất — trước khi ai đó khác đưa ra quyết định thay bạn."
+                }
+            ],
             vinhquy: [
                 {
                     stt: 1,
