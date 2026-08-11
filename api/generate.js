@@ -104,12 +104,16 @@ async function callGeminiSingle(systemPrompt, userMessage, apiKey, model) {
         generationConfig: { temperature: 0.85, maxOutputTokens: 16384 }
     };
 
+    const headers = { "Content-Type": "application/json" };
+    if (apiKey.startsWith("AQ.")) {
+        headers["Authorization"] = `Bearer ${apiKey}`;
+    } else {
+        headers["x-goog-api-key"] = apiKey;
+    }
+
     const response = await fetch(url, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey
-        },
+        headers: headers,
         body: JSON.stringify(payload)
     });
 
