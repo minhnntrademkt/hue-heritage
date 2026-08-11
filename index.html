@@ -760,8 +760,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Obfuscated Dedicated Huế Heritage API Key (Base64)
-        const OBFUSCATED_KEY = "QVEuQWI4Uk42SUN1Q3daUjV4LUdEY1FDdkpacUFkcFlLSTkyYjh6d0xVNm1LYlY1TDh5UGc=";
+        // API Key được bảo mật trên Vercel Server — không còn lưu trong client
 
         // Project Database for Huế Heritage
         const DATA_HUE_HERITAGE = 
@@ -1467,7 +1466,7 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
 
         // Call Gemini API
         async function generateStoryboard() {
-            const apiKey = atob(OBFUSCATED_KEY);
+            // apiKey không còn cần — được xử lý bởi /api/generate serverless
             const target = document.getElementById('targetAudience').value.trim();
             const apartment = document.getElementById('apartmentType').value;
             const message = document.getElementById('message').value.trim();
@@ -1516,7 +1515,7 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
                 const csbhCanho = "Chính sách Huế Heritage: Booking 50 triệu (hoàn phí), CK đợt 1 đến 15% thanh toán nhanh, 0% lãi suất vay 70% từ 18-24 tháng, tặng thẻ Royal Heritage Club.";
                 const userMsg1 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nCHIEN DICH CAN VIET KICH BAN:\nLoai san pham: ${apartment}\nCSBH: ${csbhCanho}\nTarget doi tuong: ${target}\nThong diep: ${message}\nHook: ${hook}\nThoi luong: ${duration}${benchmarkInfo}`;
 
-                const promptChuan = await callGeminiAPI(sysAssistant1, userMsg1, apiKey, selectedModel);
+                const promptChuan = await callGeminiAPI(sysAssistant1, userMsg1, selectedModel);
 
                 statusIndicator.innerHTML = `<i class="fa-solid fa-spinner"></i> Đang tạo kịch bản phân cảnh...`;
 
@@ -1537,7 +1536,7 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
 
                 const userMsg2 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nPROMPT CHIEN LUOC TU ASSIST ASSISTANT 1:\n${promptChuan}${benchmarkInfo}`;
 
-                const jsonRaw = await callGeminiAPI(sysCreator, userMsg2, apiKey, selectedModel);
+                const jsonRaw = await callGeminiAPI(sysCreator, userMsg2, selectedModel);
                 
                 const scenes = repairJson(jsonRaw);
                 renderStoryboard(scenes);
@@ -1557,55 +1556,27 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             }
         }
 
-        async function callGeminiAPI(systemPrompt, userMessage, apiKey, model = 'gemini-3.6-flash') {
-            if (window.location.protocol.startsWith('http')) {
-                try {
-                    const res = await fetch('/api/generate', {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            systemInstruction: systemPrompt,
-                            userMessage: userMessage,
-                            model: model
-                        })
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        const parts = data.candidates[0].content.parts;
-                        for (let p = 0; p < parts.length; p++) {
-                            if (parts[p].text && !parts[p].thought) return parts[p].text;
-                        }
-                        for (let q = parts.length - 1; q >= 0; q--) {
-                            if (parts[q].text) return parts[q].text;
-                        }
-                    }
-                } catch (e) {
-                    console.warn("Serverless fetch error:", e);
-                }
-            }
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-            const payload = {
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                contents: [{ role: "user", parts: [{ text: userMessage }] }],
-                generationConfig: { temperature: 0.85, maxOutputTokens: 16384 }
-            };
-
-            const response = await fetch(url, {
+        // callGeminiAPI — Gọi qua Serverless proxy /api/generate (API Key ẩn trên server)
+        async function callGeminiAPI(systemPrompt, userMessage, model = 'gemini-3.6-flash') {
+            const res = await fetch('/api/generate', {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-goog-api-key": apiKey
-                },
-                body: JSON.stringify(payload)
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    systemInstruction: systemPrompt,
+                    userMessage: userMessage,
+                    model: model
+                })
             });
 
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`HTTP ${response.status}: ${text}`);
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`Lỗi từ server: HTTP ${res.status} — ${errText}`);
             }
 
-            const data = await response.json();
+            const data = await res.json();
+            if (!data.candidates || !data.candidates[0]) {
+                throw new Error("Server không trả về kết quả hợp lệ.");
+            }
             const parts = data.candidates[0].content.parts;
             for (let p = 0; p < parts.length; p++) {
                 if (parts[p].text && !parts[p].thought) return parts[p].text;
@@ -1613,7 +1584,7 @@ BOI CANH CHỦ ĐẠO: Bat dong san di san truyen doi, gia san gia toc vinh quy 
             for (let q = parts.length - 1; q >= 0; q--) {
                 if (parts[q].text) return parts[q].text;
             }
-            throw new Error("Không tìm thấy nội dung văn bản.");
+            throw new Error("Không tìm thấy nội dung văn bản trong response.");
         }
 
         function repairJson(jsonRaw) {
