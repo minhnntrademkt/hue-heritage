@@ -11,13 +11,17 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on server.' });
     }
 
-    const { target, apartment, message, hook, duration, model = 'gemini-3.7-flash', refScript = '', refVideo = '', systemInstruction, userMessage } = req.body;
+    const { target, apartment, message, hook, duration, refScript = '', refVideo = '', systemInstruction, userMessage } = req.body;
 
     // Direct call fallback if explicitly passing systemInstruction & userMessage
     if (systemInstruction && userMessage) {
         try {
-            const rawText = await callGeminiSingle(systemInstruction, userMessage, apiKey, model);
-            return res.status(200).json({ result: rawText, candidates: [{ content: { parts: [{ text: rawText }] } }] });
+            const { text, modelName } = await callGeminiWithCascade(systemInstruction, userMessage, apiKey);
+            return res.status(200).json({ 
+                result: text, 
+                modelUsed: modelName === 'gemini-3.7-flash' ? 'Google Gemini 3.7 Flash (High Reasoning)' : `Google Gemini (${modelName})`,
+                candidates: [{ content: { parts: [{ text: text }] } }] 
+            });
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -89,25 +93,56 @@ BOI CANH DỰ ÁN ĐỢT 3 & QUY TẮC QUAY DỰNG:
     const userMsg1 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nCHIEN DICH CAN VIET KICH BAN:\nLoai san pham: ${apartment}\nCSBH: ${csbhCanho}\nTarget doi tuong: ${target}\nThong diep: ${message}\nHook: ${hook}\nThoi luong: ${duration}${benchmarkInfo}`;
 
     try {
-        // Step 1: Strategic prompt creation
-        const promptChuan = await callGeminiSingle(sysAssistant1, userMsg1, apiKey, model);
+        // Step 1: Strategic prompt creation with Gemini 3.7 Flash High Reasoning Engine
+        const step1 = await callGeminiWithCascade(sysAssistant1, userMsg1, apiKey);
 
-        // Step 2: Storyboard generation
-        const userMsg2 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nPROMPT CHIEN LUOC TU ASSIST ASSISTANT 1:\n${promptChuan}${benchmarkInfo}`;
-        const jsonRaw = await callGeminiSingle(sysCreator, userMsg2, apiKey, model);
+        // Step 2: Storyboard generation with Gemini 3.7 Flash High Reasoning Engine
+        const userMsg2 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nPROMPT CHIEN LUOC TU ASSIST ASSISTANT 1:\n${step1.text}${benchmarkInfo}`;
+        const step2 = await callGeminiWithCascade(sysCreator, userMsg2, apiKey);
 
-        return res.status(200).json({ result: jsonRaw, candidates: [{ content: { parts: [{ text: jsonRaw }] } }] });
+        return res.status(200).json({ 
+            result: step2.text, 
+            modelUsed: step2.modelName === 'gemini-3.7-flash' ? 'Google Gemini 3.7 Flash (High Reasoning)' : `Google Gemini (${step2.modelName})`,
+            candidates: [{ content: { parts: [{ text: step2.text }] } }] 
+        });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 }
 
-async function callGeminiSingle(systemPrompt, userMessage, apiKey, model) {
+async function callGeminiWithCascade(systemPrompt, userMessage, apiKey) {
+    // HARDCODED PRIORITY CASCADE: 3.7 Flash (High Thinking) -> 3.6 Flash -> 3.5 Flash
+    const modelsToTry = [
+        { name: 'gemini-3.7-flash', thinkingBudget: 4096 },
+        { name: 'gemini-3.6-flash', thinkingBudget: 0 },
+        { name: 'gemini-3.5-flash', thinkingBudget: 0 }
+    ];
+
+    let lastError = null;
+    for (const m of modelsToTry) {
+        try {
+            const resText = await callGeminiSingle(systemPrompt, userMessage, apiKey, m.name, m.thinkingBudget);
+            return { text: resText, modelName: m.name };
+        } catch (err) {
+            console.warn(`Model ${m.name} failed: ${err.message}. Trying fallback cascade...`);
+            lastError = err;
+        }
+    }
+    throw new Error(`Tất cả các mô hình Gemini AI đều gặp lỗi: ${lastError ? lastError.message : 'Unknown error'}`);
+}
+
+async function callGeminiSingle(systemPrompt, userMessage, apiKey, model, thinkingBudget = 0) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    
+    const genConfig = { temperature: 0.85, maxOutputTokens: 16384 };
+    if (thinkingBudget > 0 && model.includes('3.7')) {
+        genConfig.thinkingConfig = { thinkingBudget: thinkingBudget };
+    }
+
     const payload = {
         systemInstruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
         contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-        generationConfig: { temperature: 0.85, maxOutputTokens: 16384 }
+        generationConfig: genConfig
     };
 
     const response = await fetch(url, {
