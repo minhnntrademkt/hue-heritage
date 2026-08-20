@@ -11,7 +11,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on server.' });
     }
 
-    const { target, apartment, message, hook, duration, model = 'gemini-3.6-flash', refScript = '', refVideo = '', systemInstruction, userMessage } = req.body;
+    const { target, apartment, message, hook, duration, model = 'gemini-3.7-flash', refScript = '', refVideo = '', systemInstruction, userMessage } = req.body;
 
     // Direct call fallback if explicitly passing systemInstruction & userMessage
     if (systemInstruction && userMessage) {
