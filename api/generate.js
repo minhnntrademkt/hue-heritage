@@ -1,5 +1,26 @@
+// In-memory Circuit Breaker for OpenAI & Response Cache
+let openaiCircuit = {
+    isOpen: false,
+    openUntil: 0,
+    reason: ''
+};
+
+const responseCache = new Map();
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 phút
+
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // 1. CORS Security Hardening
+    const origin = req.headers.origin || '';
+    const allowedOrigins = [
+        'https://peninsula-storyboard.vercel.app',
+        'https://hue-heritage.vercel.app',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000'
+    ];
+
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -13,24 +34,32 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Chưa cấu hình API Key cho ChatGPT hoặc Gemini trên server.' });
     }
 
-    const { target, apartment, message, hook, duration, refScript = '', refVideo = '', systemInstruction, userMessage } = req.body;
-
-    // Direct call fallback if explicitly passing systemInstruction & userMessage
-    if (systemInstruction && userMessage) {
-        try {
-            const { text, modelName } = await callAIWithCascade(systemInstruction, userMessage, geminiKey, openAiKey);
-            return res.status(200).json({ 
-                result: text, 
-                modelUsed: modelName,
-                candidates: [{ content: { parts: [{ text: text }] } }] 
-            });
-        } catch (err) {
-            return res.status(500).json({ error: err.message });
-        }
-    }
+    let { target, apartment, message, hook, duration, refScript = '', refVideo = '' } = req.body || {};
 
     if (!target || !message || !hook) {
-        return res.status(400).json({ error: 'Missing required fields: target, message, hook' });
+        return res.status(400).json({ error: 'Thiếu các trường bắt buộc: target, message, hook' });
+    }
+
+    // 2. Input Sanitization & Length Guard (Chống Prompt Injection & Token Bloat)
+    target = String(target).trim().slice(0, 500);
+    apartment = String(apartment || 'Căn hộ Heritage 3 Phòng Ngủ').trim().slice(0, 100);
+    message = String(message).trim().slice(0, 1000);
+    hook = String(hook).trim().slice(0, 500);
+    duration = String(duration || '45-60 giây').trim().slice(0, 50);
+    refScript = String(refScript).trim().slice(0, 3000);
+    refVideo = String(refVideo).trim().slice(0, 300);
+
+    // 3. Response Cache Check (Tiết kiệm 100% Token cho request trùng lặp)
+    const cacheKey = `${target}|${apartment}|${message}|${hook}|${duration}|${refScript.slice(0, 100)}`;
+    const cached = responseCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+        return res.status(200).json({
+            result: cached.result,
+            modelUsed: `${cached.modelUsed} (Bộ nhớ đệm tốc độ cao - 0 Token)`,
+            engine: cached.engine,
+            cached: true,
+            candidates: [{ content: { parts: [{ text: cached.result }] } }]
+        });
     }
 
     // SERVER-SIDE DATA & SYSTEM PROMPTS FOR HUE HERITAGE (GIAI ĐOẠN ĐỢT 3)
@@ -59,54 +88,65 @@ BOI CANH DỰ ÁN ĐỢT 3 & QUY TẮC QUAY DỰNG:
   - NGHÊM CẤM VI PHẠM AN TOÀN: Cấm tuyệt đối mô tả Host đứng giữa công trường, đi bộ trên/trong khu vực công trường đang thi công hoặc tiếp xúc với kết cấu công trình chưa hoàn thiện vì lý do an toàn lao động.
   - BỐI CẢNH QUAY THỰC TẾ THAY THẾ: Host quay tại bờ sông Hương, công viên ven sông, điểm nhìn toàn cảnh thành phố Huế, hoặc lồng ghép phối cảnh 3D Render kiến trúc tháp và không gian 3D nội thất.`;
 
-    const sysAssistant1 = 
-        "Ban la Senior Copywriter va chuyen gia tam ly hoc hanh vi khach hang cao cap (HNWIs) tai Viet Nam.\n\n" +
-        "NHIEM VU CHINH:\n" +
-        "Dựa vào Target doi tuong, hãy viết PROMPT chiến lược cho GIAI ĐOẠN ĐỢT 3 của dự án bất động sản di sản Huế Heritage kề bên Sông Hương.\n" +
-        "- Phải tạo ra các Hook (0-3s) đánh trúng tử huyệt tâm lý (vinh quy bái tổ, di sản truyền đời, vinh hoa gia tộc, cơ hội sở hữu giỏ hàng Đợt 3...).\n" +
-        "- LƯU Ý BỐI CẢNH: Dự án đang thi công, CẤM cảnh Host đứng/đi bộ trong công trường. Hướng dẫn quay Host tại bờ sông Hương / công viên ven sông / lồng ghép 3D render.\n" +
-        "- Sử dụng chính xác diện tích: Căn hộ 3PN (85m2 - 120.5m2), Sky Villa (138.6m2 - 289.1m2).\n" +
-        "Chỉ trả về đoạn prompt chiến lược bằng tiếng Việt.";
-
-    const sysCreator = 
-        "Ban la Creative Director va Chuyen gia Viet Ad Copy Biet Thu & Bat Dong San Sieu Sang Viet Nam.\n\n" +
-        "KHUNG HƯỚNG DẪN MARKETING 4 GIAI ĐOẠN (ĐỊNH HƯỚNG CHIẾN LƯỢC CHO GIAI ĐOẠN ĐỢT 3 - HUẾ HERITAGE):\n" +
-        "1. [GIAI ĐOẠN 1: HOOK & NỖI ĐẦU] (Mốc [0:00 - 0:06]): Chạm vào nỗi đau/sự tò mò của KH (áp lực tài chính, vinh quy bái tổ, di sản truyền đời gia tộc). Hook 0-3s cực mạnh để ngắt nhịp cuộn Meta (Pattern Interrupt).\n" +
-        "2. [GIAI ĐOẠN 2: BỐI CẢNH & GIẢI PHÁP] (Mốc [0:06 - 0:20]): Giúp KH hình dung cuộc sống lý tưởng: vị trí kề Sông Hương, không gian thư giãn, tiện ích Cố Đô như giải pháp hoàn hảo cho Cảnh 1.\n" +
-        "3. [GIAI ĐOẠN 3: CẢM XÚC SỞ HỮU & TÀI CHÍNH] (Mốc [0:20 - 0:45]): Đánh mạnh cảm xúc mong muốn sở hữu gia sản truyền đời giỏ hàng Đợt 3, an tâm tài chính, chính sách 0% lãi suất, đặc quyền Royal Heritage Club.\n" +
-        "4. [GIAI ĐOẠN 4: CẤP BÁCH & KÊU GỌI HÀNH ĐỘNG] (Mốc [0:45 - Hết]): Tạo cảm giác cấp bách, giỏ hàng di sản Đợt 3 giới hạn, ưu đãi Đợt 3, thúc đẩy Đăng ký/Gọi Hotline ngay.\n\n" +
-        "YÊU CẦU QUAY DỰNG BẮT BUỘC:\n" +
-        "- KHÔNG CÓ CẢNH HOST TRONG CÔNG TRƯỜNG: Dự án đang thi công, cấm Host đứng hay đi bộ trong công trường. Quay Host tại bờ sông Hương, công viên ven sông, view thành phố Huế kết hợp 3D Render.\n" +
-        "- DIỆN TÍCH CHÍNH XÁC: Căn hộ 3PN (85m2 - 120.5m2), Sky Villa (138.6m2 - 289.1m2).\n" +
-        "- TỐI ƯU THUẬT TOÁN META ADS: 5 đến 8 cảnh phân phối dồn dập, Text Overlay ngắn gọn nổi bật dành cho người xem tắt tiếng (Sound-off viewers), Host người thật dẫn dắt sinh động.\n\n" +
-        "YÊU CẦU ĐẦU RA: Xuất ĐÚNG MỘT JSON ARRAY [] gồm 5-8 phân cảnh. Mỗi phân cảnh có 6 trường:\n" +
-        "  'stt' (số nguyên 1, 2, 3, 4...), 'duration' (VD: '5 giây', '10 giây'...), 'message', 'visual', 'textOverlay', 'vo'.\n" +
-        "Tuyệt đối chỉ trả về JSON thuần [ ... ]. Không dùng markdown, không thông tin ngoài JSON.";
+    // 4. Single-Pass High-Efficiency Master Prompt (Gộp 2 bước thành 1 - Tiết kiệm 50% Token)
+    const masterSystemPrompt = 
+        `Ban la Giam doc Sang tao (Creative Director) kiem Chuyen gia Tam ly hoc HNWIs ve Bat Dong San Di San Sieu Sang tai Hue.\n\n` +
+        `NHIỆM VỤ:\n` +
+        `Từ thông tin chiến dịch, hãy viết BẢNG KỊCH BẢN STORYBOARD 4 GIAI ĐOẠN (5 đến 8 phân cảnh) cho GIAI ĐOẠN ĐỢT 3 của dự án bất động sản di sản Huế Heritage kề bên Sông Hương.\n\n` +
+        `CẤU TRÚC 4 GIAI ĐOẠN BẮT BUỘC:\n` +
+        `1. [GIAI ĐOẠN 1: HOOK & NỖI ĐẦU] [0:00 - 0:06]: Chạm vào tử huyệt cảm xúc (vinh quy bái tổ, di sản truyền đời gia tộc, bất động sản hữu hạn kề sông Hương), ngắt nhịp cuộn Meta (Pattern Interrupt).\n` +
+        `2. [GIAI ĐOẠN 2: BỐI CẢNH & GIẢI PHÁP] [0:06 - 0:20]: Tâm điểm đường Đống Đa kề sông Hương, 5 phút đến Đại Nội, 2 khối tháp biểu tượng 19-25 tầng.\n` +
+        `3. [GIAI ĐOẠN 3: CẢM XÚC SỞ HỮU & TÀI CHÍNH] [0:20 - 0:45]: Căn 3PN (85m2 - 120.5m2) hoặc Sky Villa (138.6m2 - 289.1m2), nội thất hoàng gia cao cấp, chiết khấu Đợt 3 đến 15%, 0% lãi suất 18-24 tháng, thẻ Royal Heritage Club.\n` +
+        `4. [GIAI ĐOẠN 4: CẤP BÁCH & KÊU GỌI HÀNH ĐỘNG] [0:45 - Hết]: Giỏ hàng di sản Đợt 3 giới hạn, đặt chỗ ưu tiên 50 triệu (hoàn phí 100%), thúc đẩy Gọi Hotline/Đăng ký.\n\n` +
+        `QUY TẮC AN TOÀN BỐI CẢNH BẮT BUỘC:\n` +
+        `- Dự án đang thi công, CẤM TUYỆT ĐỐI cảnh Host đứng hay đi bộ trong công trường.\n` +
+        `- Host quay tại bờ sông Hương, công viên ven sông, view Cố Đô kết hợp phối cảnh 3D Render tháp và không gian nội thất.\n` +
+        `- DIỆN TÍCH CHUẨN: Căn hộ 3PN (85m2 - 120.5m2), Sky Villa (138.6m2 - 289.1m2).\n\n` +
+        `YÊU CẦU ĐẦU RA JSON BẮT BUỘC:\n` +
+        `Phải xuất kết quả dưới dạng JSON ARRAY gồm 5 đến 8 object. Mỗi object gồm đúng 6 trường:\n` +
+        `{"stt": 1, "duration": "[0:00 - 0:06]", "message": "...", "visual": "...", "textOverlay": "...", "vo": "..."}\n` +
+        `Chỉ trả về JSON hợp lệ, không giải thích thêm.`;
 
     let benchmarkInfo = "";
     if (refVideo || refScript) {
         benchmarkInfo = "\n\nMẪU THAM KHẢO HƯỚNG TỚI (BENCHMARK TARGET):\n";
         if (refVideo) benchmarkInfo += `- Link Video Mẫu: ${refVideo}\n`;
         if (refScript) benchmarkInfo += `- Kịch Bản Mẫu Tham Khảo:\n"""\n${refScript}\n"""\n`;
-        benchmarkInfo += "(Hãy học theo tông giọng, phong cách dẫn của Host và nhịp điệu Hook từ Mẫu Tham Khảo trên khi tạo kịch bản mới!).\n";
     }
 
-    const csbhCanho = "Chính sách Huế Heritage Đợt 3: Booking 50 triệu (hoàn phí 100%), CK đợt 3 đến 15% thanh toán nhanh, 0% lãi suất vay 70% từ 18-24 tháng, tặng thẻ Royal Heritage Club.";
-    const userMsg1 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nCHIEN DICH CAN VIET KICH BAN:\nLoai san pham: ${apartment}\nCSBH: ${csbhCanho}\nTarget doi tuong: ${target}\nThong diep: ${message}\nHook: ${hook}\nThoi luong: ${duration}${benchmarkInfo}`;
+    const userMessage = 
+        `DỮ LIỆU DỰ ÁN:\n${DATA_HUE_HERITAGE}\n\n` +
+        `<user_campaign_brief>\n` +
+        `Loại sản phẩm: ${apartment}\n` +
+        `Đối tượng mục tiêu: ${target}\n` +
+        `Thông điệp chủ đạo: ${message}\n` +
+        `Ý tưởng Hook: ${hook}\n` +
+        `Thời lượng: ${duration}\n` +
+        `${benchmarkInfo}` +
+        `</user_campaign_brief>`;
 
     try {
-        // Step 1: Strategic prompt creation (Primary: ChatGPT -> Fallback: Gemini)
-        const step1 = await callAIWithCascade(sysAssistant1, userMsg1, geminiKey, openAiKey);
+        const { text, modelName, engine } = await callAIWithCascade(masterSystemPrompt, userMessage, geminiKey, openAiKey);
 
-        // Step 2: Storyboard generation (Primary: ChatGPT -> Fallback: Gemini)
-        const userMsg2 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nPROMPT CHIEN LUOC TU ASSIST ASSISTANT 1:\n${step1.text}${benchmarkInfo}`;
-        const step2 = await callAIWithCascade(sysCreator, userMsg2, geminiKey, openAiKey);
+        // Lưu vào Cache
+        responseCache.set(cacheKey, {
+            result: text,
+            modelUsed: modelName,
+            engine: engine,
+            timestamp: Date.now()
+        });
+
+        // Dọn dẹp cache cũ nếu vượt quá 100 entries
+        if (responseCache.size > 100) {
+            const oldestKey = responseCache.keys().next().value;
+            responseCache.delete(oldestKey);
+        }
 
         return res.status(200).json({ 
-            result: step2.text, 
-            modelUsed: step2.modelName,
-            engine: step2.engine,
-            candidates: [{ content: { parts: [{ text: step2.text }] } }] 
+            result: text, 
+            modelUsed: modelName,
+            engine: engine,
+            candidates: [{ content: { parts: [{ text: text }] } }] 
         });
     } catch (err) {
         return res.status(500).json({ error: err.message });
@@ -117,14 +157,16 @@ async function callAIWithCascade(systemPrompt, userMessage, geminiApiKey, openAi
     let lastError = null;
 
     // =========================================================================
-    // TẦNG 1: ƯU TIÊN SỐ 1 DÙNG CHATGPT (OPENAI) THEO THỨ TỰ ƯU TIÊN
+    // TẦNG 1: THỬ CHATGPT (CÓ CIRCUIT BREAKER BẢO VỆ)
     // =========================================================================
-    if (openAiApiKey) {
+    const now = Date.now();
+    const isCircuitOpen = openaiCircuit.isOpen && now < openaiCircuit.openUntil;
+
+    if (openAiApiKey && !isCircuitOpen) {
         const openAiModels = [
             { name: 'gpt-4o', label: 'OpenAI ChatGPT (GPT-4o Flagship)' },
             { name: 'o3-mini', label: 'OpenAI ChatGPT (o3-mini Reasoning)' },
-            { name: 'gpt-4o-mini', label: 'OpenAI ChatGPT (GPT-4o Mini)' },
-            { name: 'gpt-4.1-mini', label: 'OpenAI ChatGPT (GPT-4.1 Mini)' }
+            { name: 'gpt-4o-mini', label: 'OpenAI ChatGPT (GPT-4o Mini)' }
         ];
 
         for (const m of openAiModels) {
@@ -132,35 +174,45 @@ async function callAIWithCascade(systemPrompt, userMessage, geminiApiKey, openAi
                 const resText = await callOpenAISingle(systemPrompt, userMessage, openAiApiKey, m.name);
                 return { text: resText, modelName: m.label, engine: 'openai' };
             } catch (err) {
-                console.warn(`[OpenAI] Model ${m.name} không khả dụng: ${err.message}. Đang thử phương án tiếp theo...`);
                 lastError = err;
+                const errStr = String(err.message).toLowerCase();
+                
+                // Nếu hết tiền hoặc lỗi quota -> Kích hoạt Circuit Breaker trong 10 phút để ngắt lặp lỗi
+                if (errStr.includes('quota') || errStr.includes('credit') || errStr.includes('balance') || errStr.includes('429')) {
+                    openaiCircuit.isOpen = true;
+                    openaiCircuit.openUntil = Date.now() + 10 * 60 * 1000;
+                    openaiCircuit.reason = err.message;
+                    console.warn(`[Circuit Breaker Bật] OpenAI hết credits/quota. Tự động chuyển thẳng sang Gemini trong 10 phút.`);
+                    break; // Dừng thử các model OpenAI khác ngay lập tức, nhảy sang Gemini
+                }
             }
         }
     }
 
     // =========================================================================
-    // TẦNG 2: TỰ ĐỘNG DỰ PHÒNG SANG GOOGLE GEMINI KHI CHATGPT HẾT USAGE/TOKEN
+    // TẦNG 2: TỰ ĐỘNG CHUYỂN SANG GOOGLE GEMINI (STRICT JSON MODE)
     // =========================================================================
     if (geminiApiKey) {
         const geminiModels = [
             { name: 'gemini-3.7-flash', thinkingBudget: 4096, label: 'Google Gemini 3.7 Flash (High Reasoning)' },
-            { name: 'gemini-3.6-flash', thinkingBudget: 0, label: 'Google Gemini 3.6 Flash' },
-            { name: 'gemini-3.5-flash', thinkingBudget: 0, label: 'Google Gemini 3.5 Flash' }
+            { name: 'gemini-3.6-flash', thinkingBudget: 0, label: 'Google Gemini 3.6 Flash' }
         ];
 
         for (const m of geminiModels) {
             try {
                 const resText = await callGeminiSingle(systemPrompt, userMessage, geminiApiKey, m.name, m.thinkingBudget);
-                const tag = openAiApiKey ? `${m.label} (Fallback tự động khi ChatGPT hết Usage)` : m.label;
+                const tag = (openAiApiKey && isCircuitOpen) 
+                    ? `${m.label} (Fallback tự động khi ChatGPT hết Credits)` 
+                    : m.label;
                 return { text: resText, modelName: tag, engine: 'gemini' };
             } catch (err) {
-                console.warn(`[Gemini] Model ${m.name} gặp lỗi: ${err.message}. Đang thử fallback...`);
+                console.warn(`[Gemini] Model ${m.name} gặp lỗi: ${err.message}.`);
                 lastError = err;
             }
         }
     }
 
-    throw new Error(`Tất cả các mô hình AI (ChatGPT & Gemini) đều không thể xử lý: ${lastError ? lastError.message : 'Unknown error'}`);
+    throw new Error(`Tất cả các mô hình AI đều không thể xử lý: ${lastError ? lastError.message : 'Unknown error'}`);
 }
 
 async function callOpenAISingle(systemPrompt, userMessage, apiKey, model) {
@@ -201,7 +253,11 @@ async function callOpenAISingle(systemPrompt, userMessage, apiKey, model) {
 async function callGeminiSingle(systemPrompt, userMessage, apiKey, model, thinkingBudget = 0) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     
-    const genConfig = { temperature: 0.85, maxOutputTokens: 16384 };
+    const genConfig = { 
+        temperature: 0.85, 
+        maxOutputTokens: 16384,
+        responseMimeType: "application/json" // Strict JSON Mode
+    };
     if (thinkingBudget > 0 && model.includes('3.7')) {
         genConfig.thinkingConfig = { thinkingBudget: thinkingBudget };
     }
