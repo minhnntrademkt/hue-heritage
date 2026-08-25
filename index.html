@@ -71,42 +71,49 @@
         /* Layout */
         .app-container {
             display: grid;
-            grid-template-columns: 420px 1fr;
-            min-height: 100vh;
+            grid-template-columns: 440px 1fr;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Sidebar Styling */
+        /* Sidebar - Optimized single-frame for macOS & Modern Monitors */
         .sidebar {
             background-color: var(--bg-secondary);
             border-right: 1px solid var(--border-color);
-            padding: 28px;
+            padding: 16px 18px;
             display: flex;
             flex-direction: column;
-            gap: 22px;
+            gap: 10px;
             overflow-y: auto;
-            position: sticky;
-            top: 0;
             height: 100vh;
+            box-sizing: border-box;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding-bottom: 18px;
+            justify-content: space-between;
+            padding-bottom: 10px;
             border-bottom: 1px solid rgba(212, 175, 55, 0.15);
         }
 
+        .brand-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .brand-logo {
-            font-size: 26px;
+            font-size: 22px;
             color: var(--accent-gold);
-            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));
+            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
         }
 
         .brand h2 {
-            font-size: 22px;
-            letter-spacing: 1px;
+            font-size: 20px;
+            letter-spacing: 0.5px;
             color: #FFFFFF;
+            margin: 0;
         }
 
         .brand h2 span {
@@ -114,40 +121,49 @@
             font-weight: 700;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 8px;
         }
 
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         .form-group label {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.5px;
         }
 
         .form-input {
             background-color: var(--bg-tertiary);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            padding: 12px 14px;
+            border-radius: 6px;
+            padding: 8px 12px;
             color: var(--text-main);
             font-family: inherit;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.2s ease;
+            box-sizing: border-box;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--accent-gold);
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
         }
 
         textarea.form-input {
-            resize: vertical;
-            min-height: 80px;
+            resize: none;
+            min-height: 42px;
+            height: 42px;
+            line-height: 1.4;
         }
 
         .select-wrapper {
@@ -159,91 +175,80 @@
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             position: absolute;
-            right: 14px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
             pointer-events: none;
+            font-size: 11px;
         }
 
         select.form-input {
             appearance: none;
             width: 100%;
             cursor: pointer;
+            padding-right: 28px;
         }
 
         /* Buttons */
         .btn-group {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 10px;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 4px;
         }
 
         .btn {
-            background: linear-gradient(135deg, var(--accent-gold) 0%, #A88225 100%);
+            background: linear-gradient(135deg, #d4af37, #aa820a);
             color: #0D0914;
             border: none;
-            border-radius: 8px;
-            padding: 14px;
+            border-radius: 6px;
+            padding: 10px 14px;
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
         }
 
         .btn:hover {
-            background: linear-gradient(135deg, var(--accent-gold-hover) 0%, var(--accent-gold) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
-        }
-
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: none;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--accent-gold);
-            color: #FFFFFF;
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.35);
         }
 
         /* Quick Samples */
         .samples-section {
             border-top: 1px solid rgba(212, 175, 55, 0.15);
-            padding-top: 20px;
+            padding-top: 10px;
         }
 
         .samples-section h4 {
-            font-size: 12px;
-            color: var(--accent-gold);
-            margin-bottom: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
         }
 
         .sample-buttons {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
         }
 
         .sample-btn {
             background-color: var(--bg-tertiary);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 6px;
+            padding: 7px 10px;
             color: var(--text-main);
-            font-size: 13px;
+            font-size: 12px;
             text-align: left;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -265,42 +270,43 @@
 
         /* Main Content View */
         .main-content {
-            padding: 32px 40px;
+            padding: 24px 32px;
             overflow-y: auto;
             height: 100vh;
+            box-sizing: border-box;
         }
 
         .content-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
-            padding-bottom: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
             border-bottom: 1px solid rgba(212, 175, 55, 0.15);
         }
 
         .content-header-info h2 {
-            font-size: 26px;
-            margin-bottom: 4px;
+            font-size: 24px;
+            margin-bottom: 2px;
             color: var(--accent-gold);
         }
 
         .content-header-info p {
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .status-badge {
             background-color: rgba(212, 175, 55, 0.1);
             border: 1px solid var(--accent-gold);
             color: var(--accent-gold);
-            padding: 8px 16px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .status-badge.loading i {
@@ -311,15 +317,15 @@
         .storyboard-feed {
             display: flex;
             flex-direction: column;
-            gap: 28px;
+            gap: 20px;
         }
 
-        /* Scene Card */
+        /* Scene Card - Full Width Studio Layout (No Phone Mockup) */
         .scene-card {
             background: var(--card-glass);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 14px;
+            padding: 20px 22px;
             backdrop-filter: blur(10px);
             box-shadow: var(--shadow-gold);
             transition: all 0.3s ease;
@@ -334,15 +340,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
-            padding-bottom: 14px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .scene-badge-group {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .scene-number {
@@ -350,9 +356,9 @@
             color: #0D0914;
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            font-size: 13px;
-            padding: 4px 10px;
-            border-radius: 6px;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
         .scene-duration {
@@ -369,27 +375,40 @@
             font-weight: 500;
         }
 
+        /* 3-Column Studio Grid for Storyboard Card */
         .scene-body {
             display: grid;
-            grid-template-columns: 1fr 280px;
-            gap: 24px;
+            grid-template-columns: 1.2fr 1fr 1.3fr;
+            gap: 16px;
         }
 
-        .scene-details {
+        @media (max-width: 1280px) {
+            .scene-body {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scene-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-block {
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 6px;
         }
 
         .detail-block h5 {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            margin: 0;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .detail-block h5 i {
@@ -399,40 +418,65 @@
         .detail-content {
             background-color: var(--bg-tertiary);
             border-radius: 8px;
-            padding: 14px;
-            font-size: 14px;
+            padding: 12px 14px;
+            font-size: 13.5px;
             color: var(--text-main);
             border: 1px solid rgba(255, 255, 255, 0.03);
-            line-height: 1.6;
+            line-height: 1.5;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .text-overlay-content {
+            background-color: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-left: 4px solid var(--accent-gold);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 13.5px;
+            color: #FFFFFF;
+            line-height: 1.5;
+            height: 100%;
+            box-sizing: border-box;
         }
 
         .vo-content {
-            background-color: rgba(212, 175, 55, 0.06);
+            background-color: rgba(212, 175, 55, 0.05);
             border: 1px dashed rgba(212, 175, 55, 0.3);
             border-radius: 8px;
-            padding: 14px;
-            font-size: 14px;
+            padding: 12px 14px;
+            font-size: 13.5px;
             color: #FFFFFF;
             font-style: italic;
+            line-height: 1.5;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         /* Voice Waveform Simulator */
         .audio-waveform-sim {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             margin-top: 10px;
-            background: rgba(0,0,0,0.3);
-            padding: 8px 12px;
+            background: rgba(0,0,0,0.35);
+            padding: 5px 12px;
             border-radius: 20px;
             width: fit-content;
             cursor: pointer;
             user-select: none;
             transition: all 0.2s ease;
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
         .audio-waveform-sim:hover {
             background: rgba(212, 175, 55, 0.15);
+            border-color: var(--accent-gold);
         }
 
         .wave-bar {
@@ -451,80 +495,6 @@
             100% { transform: scaleY(1.3); }
         }
 
-        /* Mobile Mockup Preview */
-        .mobile-mockup {
-            background-color: #120D1C;
-            border-radius: 24px;
-            border: 8px solid #281D3D;
-            height: 480px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .mobile-mockup::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 18px;
-            background-color: #281D3D;
-            border-radius: 10px;
-            z-index: 10;
-        }
-
-        .mockup-overlay-grad {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(0deg, rgba(13,9,20,0.92) 0%, rgba(13,9,20,0.3) 50%, rgba(13,9,20,0.6) 100%);
-            z-index: 1;
-        }
-
-        .mockup-content {
-            position: relative;
-            z-index: 2;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            height: 100%;
-        }
-
-        .text-overlay-preview {
-            background-color: rgba(13, 9, 20, 0.75);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            backdrop-filter: blur(5px);
-            border-radius: 8px;
-            padding: 12px;
-            color: #FFFFFF;
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            font-size: 13px;
-            line-height: 1.4;
-            text-align: center;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-            border-left: 4px solid var(--accent-gold);
-        }
-
-        .mockup-header-branding {
-            position: absolute;
-            top: 35px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            z-index: 2;
-        }
 
         .mockup-header-branding span {
             font-family: 'Playfair Display', serif;
@@ -608,105 +578,92 @@
 
     <div class="app-container">
         
-        <!-- SIDEBAR CONTROLS -->
+        <!-- SIDEBAR CONTROLS (OPTIMIZED SINGLE VIEWPORT FOR MACOS & PC) -->
         <aside class="sidebar">
             <div class="brand">
-                <i class="fa-solid fa-crown brand-logo"></i>
-                <h2>Huế <span>Heritage</span> <small style="font-size: 11px; color: var(--accent-gold); opacity: 0.85; font-weight: normal; margin-left: 6px; border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; background: rgba(212,175,55,0.08);">v10.0</small></h2>
-            </div>
-
-            <!-- Form Options -->
-            <div class="form-group">
-                <label for="targetAudience">Target Đối Tượng Khách Hàng</label>
-                <textarea id="targetAudience" class="form-input" placeholder="Gợi ý: Khách hàng kiều bào & người con xứ Huế xa quê mua tài sản di sản Đợt 3 vinh quy bái tổ..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="apartmentType">Loại Sản Phẩm Di Sản</label>
-                <div class="select-wrapper">
-                    <select id="apartmentType" class="form-input">
-                        <option value="Can ho Heritage 3 Phong Ngu" selected>Căn hộ Heritage 3 Phòng Ngủ (~85m² - 120.5m²)</option>
-                        <option value="Biet thu tren khong Sky Villa">Biệt thự trên không Sky Villa (~138.6m² - 289.1m²)</option>
-                    </select>
+                <div class="brand-info">
+                    <i class="fa-solid fa-crown brand-logo"></i>
+                    <h2>Huế <span>Heritage</span></h2>
                 </div>
+                <span style="font-size: 11px; color: var(--accent-gold); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; background: rgba(212,175,55,0.08);">v10.0</span>
             </div>
 
-            <div class="form-group">
-                <label for="message">Thông Điệp Chủ Đạo Chiến Dịch</label>
-                <textarea id="message" class="form-input" placeholder="Gợi ý: Sở hữu giỏ hàng Đợt 3 bất động sản di sản truyền đời kề bên Sông Hương nhận ưu đãi hấp dẫn..."></textarea>
+            <!-- Compact AI Engine Badge -->
+            <div style="background: rgba(16, 163, 127, 0.08); border: 1px solid rgba(16, 163, 127, 0.25); border-radius: 6px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
+                <span style="color: #4ade80; font-weight: 600;"><i class="fa-solid fa-bolt"></i> OpenAI GPT-4o / o3-mini</span>
+                <span style="color: var(--accent-gold); font-size: 10px;"><i class="fa-solid fa-shield-halved"></i> Auto-Fallback Gemini</span>
             </div>
 
-            <div class="form-group">
-                <label for="hook">Ý Tưởng Hook (0-3s đầu)</label>
-                <textarea id="hook" class="form-input" placeholder="Gợi ý: Đâu là gia sản truyền đời giá trị nhất Đợt 3 mà người con xứ Huế luôn tự hào hướng về?..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="duration">Thời Lượng Video (Bước nhảy 5s)</label>
-                <div class="select-wrapper">
-                    <select id="duration" class="form-input">
-                        <option value="45 giây (0:45)">45 Giây (0:45)</option>
-                        <option value="50 giây (0:50)">50 Giây (0:50)</option>
-                        <option value="55 giây (0:55)">55 Giây (0:55)</option>
-                        <option value="60 giây (1:00)" selected>60 Giây / 1 Phút (1:00)</option>
-                        <option value="65 giây (1:05)">65 Giây (1:05)</option>
-                        <option value="70 giây (1:10)">70 Giây (1:10)</option>
-                        <option value="75 giây (1:15)">75 Giây / 1 Phút 15s (1:15)</option>
-                        <option value="80 giây (1:20)">80 Giây / 1 Phút 20s (1:20)</option>
-                        <option value="85 giây (1:25)">85 Giây / 1 Phút 25s (1:25)</option>
-                        <option value="90 giây (1:30)">90 Giây / 1 Phút 30s (1:30)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Reference Benchmark Section -->
-            <div style="border-top: 1px dashed rgba(212, 175, 55, 0.2); padding-top: 14px; margin-top: 6px;">
+            <!-- Form Grid: 2 columns for Product & Duration -->
+            <div class="form-grid-2">
                 <div class="form-group">
-                    <label style="color: var(--accent-gold); display: flex; align-items: center; justify-content: space-between;">
-                        <span><i class="fa-solid fa-photo-film"></i> Mẫu Tham Khảo (Excel / Video / File)</span>
-                        <span style="text-transform:none; opacity:0.8; font-weight:normal; cursor:pointer; font-size:11px;" onclick="document.getElementById('refFileInput').click()"><i class="fa-solid fa-upload"></i> Tải file từ máy</span>
-                    </label>
-                    
-                    <input type="file" id="refFileInput" accept=".txt,.md,.doc,.docx,.json,.csv,.xls,.xlsx,.mp4,.mov,.webm,.avi" style="display:none;" onchange="handleRefFileUpload(event)">
-                    
-                    <input type="url" id="refVideoUrl" class="form-input" placeholder="Dán link Video mẫu (TikTok/Reels/YouTube)..." style="margin-bottom: 6px;">
-                    
-                    <textarea id="refScriptText" class="form-input" placeholder="Dán kịch bản mẫu đối thủ tại đây, hoặc nạp file Excel (.xlsx) / Video (.mp4) từ máy tính..."></textarea>
-                    
-                    <video id="refVideoPreview" controls style="display:none; width:100%; border-radius:8px; margin-top:6px; border:1px solid var(--border-color); max-height:160px; object-fit:cover;"></video>
-                    
-                    <div id="refFileStatus" style="display:none; font-size:12px; color:var(--accent-gold); align-items:center; gap:6px; margin-top:6px;">
-                        <i class="fa-solid fa-file-circle-check"></i> <span id="refFileName">File đã nạp</span>
-                        <i class="fa-solid fa-xmark" style="cursor:pointer; margin-left:auto;" onclick="clearRefFile()"></i>
+                    <label for="apartmentType">Loại Sản Phẩm</label>
+                    <div class="select-wrapper">
+                        <select id="apartmentType" class="form-input">
+                            <option value="Can ho Heritage 3 Phong Ngu" selected>Căn 3PN (85-120m²)</option>
+                            <option value="Biet thu tren khong Sky Villa">Sky Villa (138-289m²)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="duration">Thời Lượng Video</label>
+                    <div class="select-wrapper">
+                        <select id="duration" class="form-input">
+                            <option value="45 giây (0:45)">45 Giây (0:45)</option>
+                            <option value="50 giây (0:50)">50 Giây (0:50)</option>
+                            <option value="60 giây (1:00)" selected>60s / 1 Phút</option>
+                            <option value="75 giây (1:15)">75s (1:15)</option>
+                            <option value="90 giây (1:30)">90s (1:30)</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            <!-- Hardcoded Dual AI Engine Indicator (ChatGPT Primary + Gemini Fallback) -->
-            <div style="background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
-                <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #10a37f, #0d8a6a); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px;">
-                    <i class="fa-solid fa-bolt"></i>
+            <!-- Target Audience -->
+            <div class="form-group">
+                <label for="targetAudience">Target Đối Tượng Khách Hàng</label>
+                <textarea id="targetAudience" class="form-input" placeholder="Gợi ý: Kiều bào / Con xứ Huế xa quê mua di sản Đợt 3 vinh quy bái tổ..."></textarea>
+            </div>
+
+            <!-- Campaign Message -->
+            <div class="form-group">
+                <label for="message">Thông Điệp Chủ Đạo Chiến Dịch</label>
+                <textarea id="message" class="form-input" placeholder="Gợi ý: Mở bán giỏ hàng Đợt 3 di sản sông Hương nhận chiết khấu đến 15%..."></textarea>
+            </div>
+
+            <!-- Hook -->
+            <div class="form-group">
+                <label for="hook">Ý Tưởng Hook (0-3s đầu)</label>
+                <textarea id="hook" class="form-input" placeholder="Gợi ý: Đâu là gia sản truyền đời giá trị nhất Đợt 3 bên dòng Hương Giang?..."></textarea>
+            </div>
+
+            <!-- Compact Reference Section -->
+            <div class="form-group" style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(212, 175, 55, 0.2); border-radius: 6px; padding: 8px 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <label style="color: var(--accent-gold); font-size: 11px; margin: 0;"><i class="fa-solid fa-photo-film"></i> Mẫu Tham Khảo (Tùy Chọn)</label>
+                    <span style="font-size: 10px; color: var(--accent-gold); cursor: pointer; text-decoration: underline;" onclick="document.getElementById('refFileInput').click()"><i class="fa-solid fa-upload"></i> Nạp Excel/Video</span>
                 </div>
-                <div style="font-size: 12px; line-height: 1.4;">
-                    <div style="color: #4ade80; font-weight: 600; font-size: 13px;"><i class="fa-solid fa-robot"></i> Động cơ AI Kép (Ưu Tiên):</div>
-                    <div style="color: #fff; font-size: 11px; opacity: 0.95;">OpenAI ChatGPT (GPT-4o / o3-mini)</div>
-                    <div style="color: var(--accent-gold); font-size: 10px; opacity: 0.85;">⚡ Auto-Fallback: Google Gemini 3.7 Flash</div>
+                <input type="file" id="refFileInput" accept=".txt,.md,.doc,.docx,.json,.csv,.xls,.xlsx,.mp4,.mov,.webm,.avi" style="display:none;" onchange="handleRefFileUpload(event)">
+                <input type="url" id="refVideoUrl" class="form-input" placeholder="Dán link video TikTok/Reels mẫu..." style="padding: 6px 10px; font-size: 12px; height: 30px; margin-bottom: 4px;">
+                <textarea id="refScriptText" class="form-input" placeholder="Dán kịch bản mẫu đối thủ hoặc text tham khảo..." style="height: 32px; font-size: 12px;"></textarea>
+                <video id="refVideoPreview" controls style="display:none; width:100%; border-radius:6px; margin-top:4px; max-height:100px; object-fit:cover;"></video>
+                <div id="refFileStatus" style="display:none; font-size:11px; color:var(--accent-gold); align-items:center; gap:6px; margin-top:4px;">
+                    <i class="fa-solid fa-file-circle-check"></i> <span id="refFileName">File đã nạp</span>
+                    <i class="fa-solid fa-xmark" style="cursor:pointer; margin-left:auto;" onclick="clearRefFile()"></i>
                 </div>
             </div>
 
-            <!-- Actions Grid -->
+            <!-- Generate Action Button -->
             <div class="btn-group">
                 <button class="btn" id="btnGenerate" onclick="generateStoryboard()">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo Kịch Bản
-                </button>
-                <button class="btn btn-secondary" onclick="resetApp()" title="Reset trang và biểu mẫu">
-                    <i class="fa-solid fa-trash-can"></i> Xóa
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> TẠO KỊCH BẢN NGAY
                 </button>
             </div>
 
             <!-- Quick Pre-loaded Templates -->
             <div class="samples-section">
-                <h4>Kịch bản mẫu Huế Heritage (Xem ngay)</h4>
+                <h4>Kịch bản mẫu sẵn (Xem ngay)</h4>
                 <div class="sample-buttons">
                     <button class="sample-btn" onclick="loadSample('vinhquy')">
                         <span><i class="fa-solid fa-torii-gate"></i> Vinh Quy Bái Tổ (Xứ Huế)</span>
@@ -1291,36 +1248,27 @@
                         <span class="scene-touchpoint"><i class="fa-solid fa-crown"></i> ${safeMessage}</span>
                     </div>
                     <div class="scene-body">
-                        <div class="scene-details">
-                            <div class="detail-block">
-                                <h5><i class="fa-solid fa-camera"></i> Hình ảnh / Ghi chú quay (Visual)</h5>
-                                <div class="detail-content" contenteditable="true">${safeVisual}</div>
-                            </div>
-                            <div class="detail-block">
-                                <h5><i class="fa-solid fa-microphone"></i> Nội dung Voice-over (VO) thuyết minh của Host</h5>
-                                <div class="vo-content">
-                                    <div contenteditable="true" id="voText_${scene.stt}">${safeVo}</div>
-                                    <div class="audio-waveform-sim" onclick="playVoice(this, document.getElementById('voText_${scene.stt}').innerText)">
-                                        <i class="fa-solid fa-play play-icon" style="color: var(--accent-gold); font-size: 11px; margin-right: 8px;"></i>
-                                        ${waveHtml}
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Column 1: Visual Direction -->
+                        <div class="detail-block">
+                            <h5><i class="fa-solid fa-camera"></i> Hình ảnh / Ghi chú quay (Visual)</h5>
+                            <div class="detail-content" contenteditable="true">${safeVisual}</div>
                         </div>
-                        <div class="mobile-mockup" style="background-image: ${bgStyle};">
-                            <div class="mockup-overlay-grad"></div>
-                            <div class="mockup-header-branding">
-                                <span>Huế Heritage</span>
-                            </div>
-                            <div class="mockup-content">
-                                <div class="text-overlay-preview">
-                                    ${safeTextOverlay}
+
+                        <!-- Column 2: Text Overlay -->
+                        <div class="detail-block">
+                            <h5><i class="fa-solid fa-closed-captioning"></i> Chữ hiển thị (Text Overlay)</h5>
+                            <div class="text-overlay-content" contenteditable="true">${safeTextOverlay}</div>
+                        </div>
+
+                        <!-- Column 3: Voice-Over (VO) -->
+                        <div class="detail-block">
+                            <h5><i class="fa-solid fa-microphone"></i> Lời thoại Host (Voice-Over VO)</h5>
+                            <div class="vo-content">
+                                <div contenteditable="true" id="voText_${scene.stt}">${safeVo}</div>
+                                <div class="audio-waveform-sim" onclick="playVoice(this, document.getElementById('voText_${scene.stt}').innerText)">
+                                    <i class="fa-solid fa-play play-icon" style="color: var(--accent-gold); font-size: 11px; margin-right: 8px;"></i>
+                                    ${waveHtml}
                                 </div>
-                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                                    <div style="width:24px; height:24px; border-radius:50%; background:var(--accent-gold); color:#000; font-weight:bold; font-size:11px; display:flex; align-items:center; justify-content:center;">H</div>
-                                    <div style="font-size:12px; font-weight:600; color:#FFF;">hue.heritage.official</div>
-                                </div>
-                                <div style="font-size:11px; color:#AAA;">Đăng ký nhận giỏ hàng Đợt 3... #hueheritage #songhuong</div>
                             </div>
                         </div>
                     </div>
