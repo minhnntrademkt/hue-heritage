@@ -981,24 +981,40 @@
             const dueDate = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
             const dueDateStr = `${dueDate.getDate()}/${dueDate.getMonth() + 1}/${dueDate.getFullYear()}`;
 
-            // Style Definitions
+            // High-Contrast Solid Color Definitions (Đảm bảo 100% chữ đen đậm rõ nét trên mọi phiên bản Excel)
+            const colorBlack = { rgb: "000000" };
+            const colorNavy = { rgb: "1E3A8A" };
+            const colorDarkRed = { rgb: "991B1B" };
+
+            const fontCalibri = { name: "Calibri", size: 10, color: colorBlack };
+            const fontBold = { name: "Calibri", size: 10, bold: true, color: colorBlack };
+            const fontHeader = { name: "Calibri", size: 11, bold: true, color: colorBlack };
+            const fontTitle = { name: "Calibri", size: 12, bold: true, color: colorNavy };
+
+            // High-Contrast Soft Fills
+            const fillWhite = { fgColor: { rgb: "FFFFFF" } };
+            const fillHeader = { fgColor: { rgb: "E2E8F0" } }; // Soft Crisp Slate Grey/Blue
+            const fillHighlight = { fgColor: { rgb: "FEF08A" } }; // Soft Warm Light Yellow
+            const fillBanner = { fgColor: { rgb: "FED7AA" } }; // Soft Warm Peach Banner
+
             const borderThin = {
-                top: { style: "thin", color: { rgb: "000000" } },
-                bottom: { style: "thin", color: { rgb: "000000" } },
-                left: { style: "thin", color: { rgb: "000000" } },
-                right: { style: "thin", color: { rgb: "000000" } }
+                top: { style: "thin", color: { rgb: "64748B" } },
+                bottom: { style: "thin", color: { rgb: "64748B" } },
+                left: { style: "thin", color: { rgb: "64748B" } },
+                right: { style: "thin", color: { rgb: "64748B" } }
             };
 
-            const fontCalibri = { name: "Calibri", size: 10 };
-            const fontBold = { name: "Calibri", size: 10, bold: true };
-            const fontHeader = { name: "Calibri", size: 11, bold: true };
-
-            const cellTitle = (val) => ({ v: val, t: 's', s: { font: fontHeader } });
+            const cellTitle = (val) => ({ 
+                v: val !== undefined && val !== null ? String(val) : "", 
+                t: 's', 
+                s: { font: fontTitle } 
+            });
             
             const cellBorder = (val, isCenter = false, bold = false) => ({
                 v: val !== undefined && val !== null ? String(val) : "",
                 t: 's',
                 s: {
+                    fill: fillWhite,
                     font: bold ? fontBold : fontCalibri,
                     alignment: { vertical: "center", horizontal: isCenter ? "center" : "left", wrapText: true },
                     border: borderThin
@@ -1009,7 +1025,7 @@
                 v: val !== undefined && val !== null ? String(val) : "",
                 t: 's',
                 s: {
-                    fill: { fgColor: { rgb: "FFFF00" } },
+                    fill: fillHighlight,
                     font: fontBold,
                     alignment: { vertical: "center", horizontal: isCenter ? "center" : "left", wrapText: true },
                     border: borderThin
@@ -1017,10 +1033,10 @@
             });
 
             const cellPinkHeader = (val) => ({
-                v: val,
+                v: val !== undefined && val !== null ? String(val) : "",
                 t: 's',
                 s: {
-                    fill: { fgColor: { rgb: "E8DAEF" } }, // Light Pink/Lavender
+                    fill: fillHeader,
                     font: fontHeader,
                     alignment: { vertical: "center", horizontal: "center", wrapText: true },
                     border: borderThin
@@ -1028,30 +1044,30 @@
             });
 
             const cellOrangeBanner = (val) => ({
-                v: val,
+                v: val !== undefined && val !== null ? String(val) : "",
                 t: 's',
                 s: {
-                    fill: { fgColor: { rgb: "ED7D31" } }, // Vibrant Orange
-                    font: { name: "Calibri", size: 11, bold: true, color: { rgb: "000000" } },
+                    fill: fillBanner,
+                    font: { name: "Calibri", size: 11, bold: true, color: colorBlack },
                     alignment: { vertical: "center", horizontal: "left" },
                     border: borderThin
                 }
             });
 
             const cellRedText = (val, isBold = false) => ({
-                v: val,
+                v: val !== undefined && val !== null ? String(val) : "",
                 t: 's',
                 s: {
-                    font: { name: "Calibri", size: 10, bold: isBold, color: { rgb: "C00000" } },
+                    font: { name: "Calibri", size: 10, bold: isBold, color: colorDarkRed },
                     alignment: { vertical: "center", horizontal: "left", wrapText: false }
                 }
             });
 
             const cellPlainNoWrap = (val, isBold = false) => ({
-                v: val,
+                v: val !== undefined && val !== null ? String(val) : "",
                 t: 's',
                 s: {
-                    font: { name: "Calibri", size: 10, bold: isBold, color: { rgb: "000000" } },
+                    font: { name: "Calibri", size: 10, bold: isBold, color: colorBlack },
                     alignment: { vertical: "center", horizontal: "left", wrapText: false }
                 }
             });
