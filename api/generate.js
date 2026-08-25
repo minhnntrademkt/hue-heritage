@@ -6,9 +6,11 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-        return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on server.' });
+    const openAiKey = process.env.OPENAI_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
+
+    if (!openAiKey && !geminiKey) {
+        return res.status(500).json({ error: 'Chưa cấu hình API Key cho ChatGPT hoặc Gemini trên server.' });
     }
 
     const { target, apartment, message, hook, duration, refScript = '', refVideo = '', systemInstruction, userMessage } = req.body;
@@ -16,10 +18,10 @@ export default async function handler(req, res) {
     // Direct call fallback if explicitly passing systemInstruction & userMessage
     if (systemInstruction && userMessage) {
         try {
-            const { text, modelName } = await callGeminiWithCascade(systemInstruction, userMessage, apiKey);
+            const { text, modelName } = await callAIWithCascade(systemInstruction, userMessage, geminiKey, openAiKey);
             return res.status(200).json({ 
                 result: text, 
-                modelUsed: modelName === 'gemini-3.7-flash' ? 'Google Gemini 3.7 Flash (High Reasoning)' : `Google Gemini (${modelName})`,
+                modelUsed: modelName,
                 candidates: [{ content: { parts: [{ text: text }] } }] 
             });
         } catch (err) {
@@ -93,16 +95,17 @@ BOI CANH DỰ ÁN ĐỢT 3 & QUY TẮC QUAY DỰNG:
     const userMsg1 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nCHIEN DICH CAN VIET KICH BAN:\nLoai san pham: ${apartment}\nCSBH: ${csbhCanho}\nTarget doi tuong: ${target}\nThong diep: ${message}\nHook: ${hook}\nThoi luong: ${duration}${benchmarkInfo}`;
 
     try {
-        // Step 1: Strategic prompt creation with Gemini 3.7 Flash High Reasoning Engine
-        const step1 = await callGeminiWithCascade(sysAssistant1, userMsg1, apiKey);
+        // Step 1: Strategic prompt creation (Primary: ChatGPT -> Fallback: Gemini)
+        const step1 = await callAIWithCascade(sysAssistant1, userMsg1, geminiKey, openAiKey);
 
-        // Step 2: Storyboard generation with Gemini 3.7 Flash High Reasoning Engine
+        // Step 2: Storyboard generation (Primary: ChatGPT -> Fallback: Gemini)
         const userMsg2 = `BO DU LIEU DU AN:\n${DATA_HUE_HERITAGE}\n\nPROMPT CHIEN LUOC TU ASSIST ASSISTANT 1:\n${step1.text}${benchmarkInfo}`;
-        const step2 = await callGeminiWithCascade(sysCreator, userMsg2, apiKey);
+        const step2 = await callAIWithCascade(sysCreator, userMsg2, geminiKey, openAiKey);
 
         return res.status(200).json({ 
             result: step2.text, 
-            modelUsed: step2.modelName === 'gemini-3.7-flash' ? 'Google Gemini 3.7 Flash (High Reasoning)' : `Google Gemini (${step2.modelName})`,
+            modelUsed: step2.modelName,
+            engine: step2.engine,
             candidates: [{ content: { parts: [{ text: step2.text }] } }] 
         });
     } catch (err) {
@@ -110,25 +113,89 @@ BOI CANH DỰ ÁN ĐỢT 3 & QUY TẮC QUAY DỰNG:
     }
 }
 
-async function callGeminiWithCascade(systemPrompt, userMessage, apiKey) {
-    // HARDCODED PRIORITY CASCADE: 3.7 Flash (High Thinking) -> 3.6 Flash -> 3.5 Flash
-    const modelsToTry = [
-        { name: 'gemini-3.7-flash', thinkingBudget: 4096 },
-        { name: 'gemini-3.6-flash', thinkingBudget: 0 },
-        { name: 'gemini-3.5-flash', thinkingBudget: 0 }
-    ];
-
+async function callAIWithCascade(systemPrompt, userMessage, geminiApiKey, openAiApiKey) {
     let lastError = null;
-    for (const m of modelsToTry) {
-        try {
-            const resText = await callGeminiSingle(systemPrompt, userMessage, apiKey, m.name, m.thinkingBudget);
-            return { text: resText, modelName: m.name };
-        } catch (err) {
-            console.warn(`Model ${m.name} failed: ${err.message}. Trying fallback cascade...`);
-            lastError = err;
+
+    // =========================================================================
+    // TẦNG 1: ƯU TIÊN SỐ 1 DÙNG CHATGPT (OPENAI) THEO THỨ TỰ ƯU TIÊN
+    // =========================================================================
+    if (openAiApiKey) {
+        const openAiModels = [
+            { name: 'gpt-4o', label: 'OpenAI ChatGPT (GPT-4o Flagship)' },
+            { name: 'o3-mini', label: 'OpenAI ChatGPT (o3-mini Reasoning)' },
+            { name: 'gpt-4o-mini', label: 'OpenAI ChatGPT (GPT-4o Mini)' },
+            { name: 'gpt-4.1-mini', label: 'OpenAI ChatGPT (GPT-4.1 Mini)' }
+        ];
+
+        for (const m of openAiModels) {
+            try {
+                const resText = await callOpenAISingle(systemPrompt, userMessage, openAiApiKey, m.name);
+                return { text: resText, modelName: m.label, engine: 'openai' };
+            } catch (err) {
+                console.warn(`[OpenAI] Model ${m.name} không khả dụng: ${err.message}. Đang thử phương án tiếp theo...`);
+                lastError = err;
+            }
         }
     }
-    throw new Error(`Tất cả các mô hình Gemini AI đều gặp lỗi: ${lastError ? lastError.message : 'Unknown error'}`);
+
+    // =========================================================================
+    // TẦNG 2: TỰ ĐỘNG DỰ PHÒNG SANG GOOGLE GEMINI KHI CHATGPT HẾT USAGE/TOKEN
+    // =========================================================================
+    if (geminiApiKey) {
+        const geminiModels = [
+            { name: 'gemini-3.7-flash', thinkingBudget: 4096, label: 'Google Gemini 3.7 Flash (High Reasoning)' },
+            { name: 'gemini-3.6-flash', thinkingBudget: 0, label: 'Google Gemini 3.6 Flash' },
+            { name: 'gemini-3.5-flash', thinkingBudget: 0, label: 'Google Gemini 3.5 Flash' }
+        ];
+
+        for (const m of geminiModels) {
+            try {
+                const resText = await callGeminiSingle(systemPrompt, userMessage, geminiApiKey, m.name, m.thinkingBudget);
+                const tag = openAiApiKey ? `${m.label} (Fallback tự động khi ChatGPT hết Usage)` : m.label;
+                return { text: resText, modelName: tag, engine: 'gemini' };
+            } catch (err) {
+                console.warn(`[Gemini] Model ${m.name} gặp lỗi: ${err.message}. Đang thử fallback...`);
+                lastError = err;
+            }
+        }
+    }
+
+    throw new Error(`Tất cả các mô hình AI (ChatGPT & Gemini) đều không thể xử lý: ${lastError ? lastError.message : 'Unknown error'}`);
+}
+
+async function callOpenAISingle(systemPrompt, userMessage, apiKey, model) {
+    const url = 'https://api.openai.com/v1/chat/completions';
+    const messages = [];
+    if (systemPrompt) {
+        messages.push({ role: 'system', content: systemPrompt });
+    }
+    messages.push({ role: 'user', content: userMessage });
+
+    const payload = {
+        model: model,
+        messages: messages,
+        temperature: 0.85
+    };
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`OpenAI HTTP ${response.status}: ${text}`);
+    }
+
+    const data = await response.json();
+    if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+        throw new Error('OpenAI không trả về nội dung văn bản hợp lệ.');
+    }
+    return data.choices[0].message.content;
 }
 
 async function callGeminiSingle(systemPrompt, userMessage, apiKey, model, thinkingBudget = 0) {
@@ -156,7 +223,7 @@ async function callGeminiSingle(systemPrompt, userMessage, apiKey, model, thinki
 
     if (!response.ok) {
         const text = await response.text();
-        throw new Error(`HTTP ${response.status}: ${text}`);
+        throw new Error(`Gemini HTTP ${response.status}: ${text}`);
     }
 
     const data = await response.json();
